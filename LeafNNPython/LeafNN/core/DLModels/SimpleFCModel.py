@@ -11,6 +11,8 @@ from LeafNN.core.DLModels.BaseModel import BaseModel
 from LeafNN.utils.MathUtils import MathUtils 
 from LeafNN.core.DLModels.GradientDescentFactory import GradientDescentFactory as GF
 from LeafNN.core.DLModels.ModelEvaluation import ModelEvaluation as ME
+from LeafNN.core.FuncFactory.ActiveFuncFactory import ActiveFuncFactory as ActiveF
+
 class SimpleFCModel(BaseModel):
     def __init__(self,layerSize,layerNodeSizeList):
         super(SimpleFCModel,self).__init__(layerSize,layerNodeSizeList)
@@ -45,33 +47,7 @@ class SimpleFCModel(BaseModel):
         self.trainProportion = 0.7
         self.crossValidationProportion = 0.0
         self.testProportion = 0.3
-
-    def defaultActive(X):
-        """
-        sigmoid func
-        input: inputX 
-        """
-        return 1.0/(1.0+np.exp(-X))
-        #return np.exp(-np.maximum(X, 0)) / (1 + np.exp(-np.abs(X)))
-        #return np.exp(-np.clip(X,-500.0,500.0))
-    def derivDefaultActive(X):
-        """
-        derivative of sigmoid func  d_sigmoid = sigmoid*(1-sigmoid)
-        ds/dx = e^(-x)/(1+e^(-x))^2 = 1/(1+e^(-x))*(1 -1/(1+e^(-x))
-        X 
-        """
-        sig = 1.0/(1.0+np.exp(-X))
-        return sig*(1.0-sig)
     
-    def derivDefaultActiveFromA(a):
-        """
-        derivative of sigmoid func  d_sigmoid = sigmoid*(1-sigmoid)
-        ds/dx = e^(-x)/(1+e^(-x))^2 = 1/(1+e^(-x))*(1 -1/(1+e^(-x))
-        X 
-        da/dz = a(1-a)
-        """
-        return a*(1.0-a)
-
     def defaultCost(Y, Y_p):
         """
         Binary classification: 
@@ -126,7 +102,7 @@ class SimpleFCModel(BaseModel):
     
     def __activeNode(self,input):
         if(self.activeFunc is None):
-            return SimpleFCModel.defaultActive(input)
+            return ActiveF.Sigmoid(input)
         else:
             return self.activeFunc(input)
         
@@ -144,7 +120,7 @@ class SimpleFCModel(BaseModel):
             return self.quickDerivDlDz(self.trainY,outputY)
     def __derivDADz(self,a,z):
         if(self.derivActiveFunc is None):
-            return SimpleFCModel.derivDefaultActiveFromA(a)
+            return ActiveF.DerivSigmoidFromS(a)
         else:
             return self.derivActiveFunc(z)
     def predictWithParams(self,inputX,weights,bias):
