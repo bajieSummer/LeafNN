@@ -461,18 +461,6 @@ class SimpleFCModel(BaseModel):
         print('train end>>>')
        
         return trainCompleted
-
-    def calGrossClassifyPassRate(Y_p,Y):
-        #todo only for binary classification
-        n = len(Y)
-        if(n == 0):
-            print("the test data set is empty")
-            return -1
-        passNums = 0
-        for i in range(n):
-            if(np.abs(Y[i]-Y_p[i]) < 0.5): # for sigmoid func and classification loss func (todo)
-                passNums +=1
-        return passNums/n
     
     def testCalCostGrad(self,initTheta,X):
         return self.__calCostGradWithParams(initTheta,X)
@@ -523,7 +511,7 @@ class SimpleFCModel(BaseModel):
             print("model not initialized call self.train")
             return testCompleted
         outputY,cacheA,cacheZ= self.predict(self.testX)
-        passRate = SimpleFCModel.calGrossClassifyPassRate(outputY,self.testY)
+        passRate = ME.getBinaryClassifyAccuracy(self.testY,outputY)
         return(passRate,outputY)
     
     def getTrainAccuracy(self,Y_p):
