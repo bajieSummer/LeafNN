@@ -11,9 +11,11 @@ class LossFuncFactory:
         3. y_p_i: the predicted result for ith example
         1 first row of Y_p, Y means the first example, 2rd row relate to 2rd example
         """
-        Epsilon = 1e-16
-        Y_p = np.clip(Y_p, Epsilon, 1.0 - Epsilon) 
-        Loss = -1*( Y*np.log(Y_p)+(1.0-Y)*np.log(1.0-Y_p) )
+        # not proper when training, leading to not converged
+        # Epsilon = 1e-16
+        # Y_p = np.clip(Y_p, Epsilon, 1.0 - Epsilon) 
+        Loss = -1*( Y*np.log(Y_p)+(1.0-Y)*np.log(1.0-Y_p))
+        Loss[((Y == 1.0)&(Y_p == 1.0)) |((Y==0.0)&(Y_p==0.0))] = 0.0 
         return Loss
     
     def DerivBinaryClassify(Y,Y_p):

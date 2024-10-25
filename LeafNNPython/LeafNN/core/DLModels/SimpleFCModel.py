@@ -12,7 +12,7 @@ from LeafNN.utils.MathUtils import MathUtils
 from LeafNN.core.DLModels.GradientDescentFactory import GradientDescentFactory as GF
 from LeafNN.core.DLModels.ModelEvaluation import ModelEvaluation as ME
 from LeafNN.core.FuncFactory.ActiveFuncFactory import ActiveFuncFactory as ActiveF
-
+from LeafNN.core.FuncFactory.LossFuncFactory import LossFuncFactory as LossF
 class SimpleFCModel(BaseModel):
     def __init__(self,layerSize,layerNodeSizeList):
         super(SimpleFCModel,self).__init__(layerSize,layerNodeSizeList)
@@ -47,42 +47,7 @@ class SimpleFCModel(BaseModel):
         self.trainProportion = 0.7
         self.crossValidationProportion = 0.0
         self.testProportion = 0.3
-    
-    def defaultCost(Y, Y_p):
-        """
-        Binary classification: 
-        L = -1/n * sum(y_i*log(y_p_i) + (1-y_i)*log(1-y_p_i)) 
-        1. (i= 1 ~ n)
-        2. y_i: the corrected result for ith example
-        3. y_p_i: the predicted result for ith example
-        1 first row of Y_p, Y means the first example, 2rd row relate to 2rd example
-        """
-        Epsilon = 1e-15
-        n = len(Y)
-        Cost = None
-        #Y_p = np.clip(Y_p, Epsilon, 1.0 - Epsilon) 
-        T = Y*np.log(Y_p)+(1.0-Y)*np.log(1.0-Y_p)
-        # to avoid nan
-        T[((Y == 1.0)&(Y_p == 1.0)) |((Y==0.0)&(Y_p==0.0))] = 0.0  # Loss is zero when both Y and Y_p are 1
-        Cost = -1.0/n*np.sum(T,axis=0)
-        Cost = Cost.item()
-        # if(np.isnan(Cost.any())):
-        #     print(Y_p)
-        #     Cost = -1.0/n*np.sum(Y*np.log(Y_p+Epsilon)+(1.0-Y)*np.log(1.0-Y_p+Epsilon),axis=0)
-        #     print("here is nan")
-        if np.isnan(Cost):
-            print("here1")
-        if np.isinf(Cost):
-            print("here2")
-        return Cost
-    
-    def DerivDefaultLoss(Y,Y_p):
-        """
-        dL/dY_p = -1/n * sum (y_i*1/y_p_i + (1-y_i)*1/(1-y_p_i))
-        """
-        n = len(Y)
-        return -1/n*np.sum((Y+Y_p-2*Y*Y_p)/(Y_p*(1-Y_p)),axis=0)
-    
+
     def __quickDefaultDLDYMainFunc(Y,Y_p):
         """
         default Loss L = -1/n * sum(y_i*log(y_p_i) + (1-y_i)*log(1-y_p_i)) 
@@ -107,15 +72,16 @@ class SimpleFCModel(BaseModel):
             return self.activeFunc(input)
         
     def __calCost(self,outputY):
+        n = len(outputY)
         if(self.lossFunc is None ):
-            return SimpleFCModel.defaultCost(self.trainY,outputY)
+            return 1/n*np.sum(LossF.BinaryClassify(self.trainY,outputY))
         else:
-            n = len(outputY)
             return 1/n*np.sum(self.lossFunc(self.trainY,outputY))
     
-    def __derivDlDy(self,outputY):
+    def __derivDJDy(self,outputY):
         if(self.quickDerivDlDz is None):
-            return SimpleFCModel.__quickDefaultDLDYMainFunc(self.trainY,outputY)
+            n = outputY.shape[0]
+            return 1/n*LossF.DLDZBinaryClassify2Sigmoid(self.trainY,outputY)
         else:
             return self.quickDerivDlDz(self.trainY,outputY)
     def __derivDADz(self,a,z):
@@ -240,7 +206,7 @@ class SimpleFCModel(BaseModel):
             al_1 = cacheA[l-1]
             DAl_DZl = self.__derivDADz(al,cacheZ[l])
             if(l == self.layerSize-1): # handle last layer of network
-                cachedLZ[l] =  self.__derivDlDy(al)
+                cachedLZ[l] =  self.__derivDJDy(al)
             else:
                 dLdZlP1 = cachedLZ(l+1)
                 cachedLZ = np.matmul(dLdZlP1,np.transpose(self.modelWeights[l]))*DAl_DZl
