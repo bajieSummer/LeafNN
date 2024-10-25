@@ -1,0 +1,6 @@
+.DS_Store
+logs/
+jupyter_notebook/
+myenv/
+__pycache__/
+
