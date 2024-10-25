@@ -47,18 +47,6 @@ class SimpleFCModel(BaseModel):
         self.trainProportion = 0.7
         self.crossValidationProportion = 0.0
         self.testProportion = 0.3
-
-    def __quickDefaultDLDYMainFunc(Y,Y_p):
-        """
-        default Loss L = -1/n * sum(y_i*log(y_p_i) + (1-y_i)*log(1-y_p_i)) 
-        L = sum(T(y,y_p))
-        T(y,y_p) = -1/n*(y*log(y_p) + (1-y)*log(1-y_p) )
-        DL/DY_P = sum(DT/DZ)
-        return the result of DT/DY_P
-        """
-        n = len(Y)
-        result = -1/n*(Y-Y_p)
-        return result
      
     def hasInitialized(self):
         if self.modelBias is None or self.modelWeights is None:
