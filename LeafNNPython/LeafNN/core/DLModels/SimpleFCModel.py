@@ -53,8 +53,6 @@ class SimpleFCModel(BaseModel):
         """
         return 1.0/(1.0+np.exp(-X))
         #return np.exp(-np.maximum(X, 0)) / (1 + np.exp(-np.abs(X)))
-        if(X.any()>500.0 or X.any() <-500.0):
-            print("overflow")
         #return np.exp(-np.clip(X,-500.0,500.0))
     def derivDefaultActive(X):
         """
