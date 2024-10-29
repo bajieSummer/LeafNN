@@ -135,7 +135,7 @@ class GradientDescentFactory:
             return False
         
         
-    def LineSearchWithWolfe(wb,getCostFunc,getGradFunc,J1,grad1,P,maxSearch,c1,c2,initAlpha,iteralNum):
+    def LineSearchWithWolfe(wb,dataXY,calCostGrads,J1,grad1,P,maxSearch,c1,c2,initAlpha,iteralNum):
         print("wolfe")
         alpha = initAlpha
         gradPower2 = GradientDescentFactory.layersDot(grad1,grad1)
@@ -150,8 +150,7 @@ class GradientDescentFactory:
             step +=1
             deltWb =  GradientDescentFactory.layersMulti(P,alpha)
             wb_new = GradientDescentFactory.layersPlus(wb,deltWb)
-            [J2,cacheA,cacheZ] = getCostFunc(wb_new)
-            grad2 = getGradFunc(cacheA,cacheZ)
+            [J2,grad2] = calCostGrads(wb_new,dataXY)
             print(f"LineSearchWithWolfe_ trainWithLineSearch>> J1={J1},grads1 dldw={grad1[0][0]},grads1 dldb={grad1[1][0]} gradPower2={gradPower2}  p={P[0][0]},p_2={P[1][0]}")
             print(f"LineSearchWithWolfe_ trainWithLineSearch>> J2={J2},grads2 dldw={grad2[0][0]},grads2 dldb={grad2[1][0]}")
             if(not GradientDescentFactory.FitWolfeCondition1(P,c1,J2,J1,grad1,alpha)):
@@ -167,7 +166,7 @@ class GradientDescentFactory:
 
   
 
-    def BatchGradientWithLineSearch(wb,getCostFunc,getGradFunc,J1,grad1,iteralNum,lastGrad):
+    def BatchGradientWithLineSearch(wb,dataXY,calCostGrads,J1,grad1,iteralNum,lastGrad):
         """
         return [wb,grads,J2,alpha] 
         wb[0]:weights,wb[1]:bias, 
@@ -188,7 +187,7 @@ class GradientDescentFactory:
         delt = GDF.layersPlus(grad1,GDF.layersMulti(lastGrad,-1.0))
         beta = GDF.layersDot(lastGrad,delt)/GDF.layersDot(lastGrad,lastGrad)
         P = GDF.layersPlus(P0,GDF.layersMulti(lastGrad,beta))
-        return GDF.LineSearchWithWolfe(wb,getCostFunc,getGradFunc,J1,grad1,P,maxSearch,c1,c2,initAlpha,iteralNum)
+        return GDF.LineSearchWithWolfe(wb,dataXY,calCostGrads,J1,grad1,P,maxSearch,c1,c2,initAlpha,iteralNum)
     
     # only for 1 layer testing
     def packWB(weights,bias):

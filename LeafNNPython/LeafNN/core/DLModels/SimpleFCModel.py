@@ -13,6 +13,7 @@ from LeafNN.core.DLModels.GradientDescentFactory import GradientDescentFactory a
 from LeafNN.core.DLModels.ModelEvaluation import ModelEvaluation as ME
 from LeafNN.core.FuncFactory.ActiveFuncFactory import ActiveFuncFactory as ActiveF
 from LeafNN.core.FuncFactory.LossFuncFactory import LossFuncFactory as LossF
+from LeafNN.core.DLModels.GradientCheck import GradientCheck
 class SimpleFCModel(BaseModel):
     def __init__(self,layerSize,layerNodeSizeList):
         super(SimpleFCModel,self).__init__(layerSize,layerNodeSizeList)
@@ -243,73 +244,8 @@ class SimpleFCModel(BaseModel):
             self.__ETLastCost = currentCost
         return result
     
-    def __checkGradients(self,iterationNum):
-        print(f"check_gradients begin>>iterationNum={iterationNum}")
-        if(iterationNum%self.gradientCheckFrequency !=0):
-            return True
-        print("check_gradients22>>,modelWeights")
-        # wn1 = w_ij(l)+ ep1 
-        # wn2 = w_ij(l)- ep1
-        cacheWn1 = copy.deepcopy(self.modelWeights)
-        print(cacheWn1)
-        cacheCheckDlDW = [None]*(self.layerSize-1) 
-        # bn1 = b_j(l)+ ep1 
-        # bn2 = b_j(l)- ep1
-        cachebn1 = copy.deepcopy(self.modelBias)
-        print(cachebn1)
-        cacheCheckDlDB = [None]*(self.layerSize-1)
-        isCheckPass = True 
-        for l in range(self.layerSize-1):
-            nl1 = self.layerNodeSizeList[l]
-            nl2 = self.layerNodeSizeList[l+1]
-            cacheCheckDlDW[l] = np.zeros([nl1,nl2])
-            cacheCheckDlDB[l] = np.zeros([1,nl2])
-            print(f"checkgradients_in layer{l},l nodes={nl1}, l+1 nodes={nl2},dldB shape={self.derivLB[l].shape}")
-            for i in range(nl1):
-                for j in range(nl2):
-                    # wn1 = wij+epsilon
-                    print(f"checkgradients_dldw l={l},i={i},j={j} dldw={self.derivLW[l][i][j]}")
-                    eps = MathUtils.Epsilon
-                    cacheWn1[l][i][j] += eps
-                    print("predict Y1(wi+epsilon)>>")
-                    outputY1,cacheA,cacheZ = self.predictWithParams(self.trainX,cacheWn1,self.modelBias)
-                    print(f"i ={i},j={j} z(L)={cacheZ[self.layerSize-1]} A(L)={cacheA[self.layerSize-1]}")
-                    J1 = self.__calCost(outputY1)
-                    print("cost>>",J1)
-                    # wn2 = wij - epsion
-                    cacheWn1[l][i][j] -= 2*eps
-                    print("predict Y2(wi-epsilon)>>")
-                    outputY2,cacheA,cacheZ = self.predictWithParams(self.trainX,cacheWn1,self.modelBias)
-                    print(f"i ={i},j={j} z(L)={cacheZ[self.layerSize-1]} A(L)={cacheA[self.layerSize-1]}")
-                    J2 = self.__calCost(outputY2)
-                    chekdW = J1/(2.0*eps) - J2/(2.0*eps)
-                    print(f"checkgradients_dldw l={l} i={i},j={j} cost1>{J1} cost2>{J2},checkdldw={chekdW},computerdldw = {self.derivLW[l][i][j]}")
-                    cacheCheckDlDW[l][i][j]= chekdW 
-                    if(np.abs(self.derivLW[l][i][j] - chekdW)>MathUtils.GradCheckMinDiff):
-                        print(f"gradient checking: computing_dldw_wrong : checkDiff chekdW={chekdW},computerdldw = {self.derivLW[l][i][j]},layer={l},i={i},j={j}:")
-                        isCheckPass = False
-                    #recover wij
-                    cacheWn1[l][i][j] += eps
-                    #computer b
-                    if( i == 0):
-                        cachebn1[l][i][j] += eps
-                        outputY1,cacheA,cacheZ = self.predictWithParams(self.trainX,self.modelWeights,cachebn1)
-                        J1 = self.__calCost(outputY1)
-                        print(f"b={cachebn1[l][i][j]}")
-                        cachebn1[l][i][j] -= 2*eps
-                        print(f"b={cachebn1[l][i][j]}")
-                        outputY2,cacheA,cacheZ = self.predictWithParams(self.trainX,self.modelWeights,cachebn1)
-                        J2 = self.__calCost(outputY2)
-                        checkDB =  (J1-J2)/(2*eps)
-                        cachebn1[l][i][j] += eps
-                        cacheCheckDlDB[l][i][j] = checkDB
-                        print(f"checkgradients_dldb l={l},i={i},j={j} dldb={self.derivLB[l][i][j]} checkDB={checkDB} j1={J1},j2={J2}")
-                        if(np.abs(self.derivLB[l][i][j] - checkDB)>MathUtils.GradCheckMinDiff):
-                            print(f"gradient checking: computing_dldb_wrong : checkDiff diffDB={checkDB}: computer dldb:{self.derivLB[l][i][j]} layer={l},i={i},j={j} diff={self.derivLB[l][i][j] - checkDB}")
-                            isCheckPass = False
-        if not isCheckPass:
-            print(f"Check Not Passed: the differences between check result and gradient computing:")
-        print(f"check_gradients end>>>>>>")
+    def __checkGradients(self,iterationNum,wb,grads):
+        isCheckPass = GradientCheck.Check(iterationNum,self.gradientCheckFrequency,wb,grads,self.__calCostWithFullParams,[self.trainX,self.trainY])
         return isCheckPass
     
     def __monitorTrainWithJ(self,depth,J,grads,monitorOption,resultMonitorData):
@@ -358,11 +294,11 @@ class SimpleFCModel(BaseModel):
             resultMonitorData.iterationInds.append(depth)
             resultMonitorData.costs.append(cost)
             resultMonitorData.grads.append(grad)
-
-    def __calCostWithParams(self,wb):
-        [outputY,cacheA,cacheZ] =self.predictWithParams(self.trainX,wb[0],wb[1])
+    
+    def __calCostWithFullParams(self,wb,dataXY):
+        [outputY,cacheA,cacheZ] =self.predictWithParams(dataXY[0],wb[0],wb[1])
         cost = self.__calCost(outputY)
-        return [cost,cacheA,cacheZ]
+        return cost
     
     def __calGradsWithCache(self,cacheA,cacheZ):
         self.__backwardNeurals(cacheA,cacheZ)
@@ -399,7 +335,10 @@ class SimpleFCModel(BaseModel):
             self.__backwardNeurals(cacheA,cacheZ)
             if(self.enableEarlyStop and self.__isEarlyStop(outputY,depth)):
                 break # earlyStop
-            if(self.enableGradientCheck and not self.__checkGradients(depth)):
+            wb = [self.modelWeights,self.modelBias]
+            grads = [self.derivLW,self.derivLB]
+            # isCheck =  GradientCheck.Check(depth,self.gradientCheckFrequency,wb,grads,self.__calCostWithFullParams,[self.trainX,self.trainY])
+            if(self.enableGradientCheck and not self.__checkGradients(depth,wb,grads)):
                 trainCompleted = False
                 break # gradientCheck
             self.__mointorTrain(depth,outputY,monitorOption,outMonitorData)
@@ -431,8 +370,9 @@ class SimpleFCModel(BaseModel):
         self.__initTrain()
         depth = 0
         wb = [self.modelWeights,self.modelBias]
-        [J1,cacheA,cacheZ] = self.__calCostWithParams(wb)
-        grads = self.__calGradsWithCache(cacheA,cacheZ)
+        # [J1,cacheA,cacheZ] = self.__calCostWithFullParams(wb,[self.trainX,self.trainY])
+        # grads = self.__calGradsWithCache(cacheA,cacheZ)
+        [J1,grads] = self.__calCostGradWithParamsNoPack(wb,[self.trainX,self.trainY])
         lastGrads = copy.deepcopy(grads)
         wb_new = []
         print(f"train2 >> J1={J1},grads dldw={grads[0][0]},grads dldb={grads[1][0]}")
@@ -442,13 +382,14 @@ class SimpleFCModel(BaseModel):
             # if(self.enableEarlyStop):
             #     if(self.__isEarlyStop(Y,depth)):
             #         break # earlyStop
-            if(self.enableGradientCheck and not self.__checkGradients(depth)):
+            
+            if(self.enableGradientCheck and not self.__checkGradients(depth,wb,grads) ):
                 trainCompleted = False
                 break # gradientCheck
             self.__monitorTrainWithJ(depth,J1,grads,monitorOption,outMonitorData)
             print(f"beforeBatchGradientUpdate>>>depth={depth}cost={J1},weight={wb[0][0]} bias={wb[1][0]}")
             
-            [wb_new,grad2,J2,alpha] = GF.BatchGradientWithLineSearch(wb,self.__calCostWithParams,self.__calGradsWithCache,J1,grads,depth,lastGrads)
+            [wb_new,grad2,J2,alpha] = GF.BatchGradientWithLineSearch(wb,[self.trainX,self.trainY],self.__calCostGradWithParamsNoPack,J1,grads,depth,lastGrads)
             print(f"afterBatchGradientUpdate>>>cost={J2},alpha={alpha},weight={wb_new[0][0]} bias={wb_new[1][0]}")
             J1 = J2
             lastGrads = grads
@@ -464,7 +405,7 @@ class SimpleFCModel(BaseModel):
     
     def testCalCostGrad(self,initTheta,X):
         return self.__calCostGradWithParams(initTheta,X)
-
+    
     """
     initTheta = [[1.0],[2.0],[3,0]]
     """
@@ -474,6 +415,13 @@ class SimpleFCModel(BaseModel):
         cost = self.__calCost(y_p)
         self.__backwardNeurals(cacheA,cacheZ)
         grads = GF.packWB(self.derivLW,self.derivLB)
+        return [cost,grads]
+    
+    def __calCostGradWithParamsNoPack(self,wb,dataXY):
+        [y_p,cacheA,cacheZ] = self.predictWithParams(dataXY[0],wb[0],wb[1])
+        cost = self.__calCost(y_p)
+        self.__backwardNeurals(cacheA,cacheZ)
+        grads = [self.derivLW,self.derivLB]
         return [cost,grads]
     
     def train3(self,monitorOption=None,outMonitorData=None):
