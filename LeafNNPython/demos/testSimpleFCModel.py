@@ -160,9 +160,9 @@ def initTestBiasAndWeights():
     # expect b = -25.161\n w1 =0.206\n w2 = 0.201 with 400 interation
 
     weights = [None]*1
-    weights[0] = np.array([[100.0],[100.0]]) #[-0.78685205],[-0.96436821] # 0.2,0.2  # 10.0,15.0 strange problem
+    weights[0] = np.array([[0.0],[0.0]]) #[-0.78685205],[-0.96436821] # 0.2,0.2  # 10.0,15.0 strange problem
     bias = [None]*1 
-    bias[0] = np.array([[1000.0]])  #-10.0 #[100.0]
+    bias[0] = np.array([[0.0]])  #-10.0 #[100.0]
      
     # testcase3: wrong dldw and checkdw w =1.20092166,1.12628422,b=1.12628422
     # weights =[np.array([[1.20092166],
@@ -186,15 +186,15 @@ logisticModel.testProportion = 0.0
 logisticModel.learnRate =  0.0002 # 0.0015625#
 logisticModel.setData(dataX,dataY)
 logisticModel.initWeights = initTestBiasAndWeights
-logisticModel.maxIterationNum = 400
-logisticModel.enableGradientCheck = False
+logisticModel.maxIterationNum = 10
+logisticModel.enableGradientCheck = True
 logisticModel.gradientCheckFrequency = 1
 logisticModel.enableEarlyStop = False
 monitorOpiton=tp.MonitorOption()
 monitorOpiton.enable = True
 monitorData=tp.MonitorData()
 [initWeights,initBias] = initTestBiasAndWeights()
-complete = logisticModel.train3(monitorOpiton,monitorData)
+complete = logisticModel.train2(monitorOpiton,monitorData)
 [cost,grads]= logisticModel.testCalCostGrad(np.array([[98.05141701],
  [-0.78685205],
  [-0.96436821]]),logisticModel.trainX)
