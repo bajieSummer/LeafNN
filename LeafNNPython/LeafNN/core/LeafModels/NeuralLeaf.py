@@ -1,31 +1,43 @@
 import numpy as np
+from LeafNN.utils.Log import Log
 from LeafNN.core.LeafModels.Leaf import Leaf
+NeuralLeafTag = "NeuralLeafTag"
 class NeuralLeaf(Leaf):
     def __init__(self,matrixArray):
-        super.__init__(matrixArray)
+        super().__init__(matrixArray)
     
     def XAddOnes(X):
         ones_x = np.ones([X.shape[0],1])
         X = np.hstack([ones_x,X])
         return X
     
+    """
+    X_input: dataX
+    activeFunc: active function
+    return[Z,A] Z:Leaf, A:Leaf
+    """
     def forward(self,X_input,activeFunc):
         #WX
         X = NeuralLeaf.XAddOnes(X_input)
-        z_matrixs = [None]
+        z_matrixs = [None]#first layer don't process
         a_matrixs = [X]
         success = True
         lastA = X
-        for mat in self.__matrixs:
+        layerSize = self.getLayerSize()
+        l = 0
+        for mat in self._matrixs:
             z = np.dot(lastA,mat)
-            z = NeuralLeaf.XAddOnes(z)
             z_matrixs.append(z)
-            a_matrixs.append(activeFunc(z))
-            lastA = z
+            a =activeFunc(z)
+            l+=1
+            if(l<layerSize):
+                a = NeuralLeaf.XAddOnes(a)
+            a_matrixs.append(a)
+            lastA = a
         if success:
             return [Leaf(z_matrixs),Leaf(a_matrixs)]
     
-    def backward(self,Z:'Leaf',A:'Leaf',DADzFunc,DJDzFunc,data):
+    def backward(self,Z:'Leaf',A:'Leaf',DADzFunc,DJDzFunc,data)->Leaf:
         """
          w[l][0][j] :bias
         backward to get gradients dL/dwij  --> derivLW
@@ -43,20 +55,20 @@ class NeuralLeaf(Leaf):
         A: A = active(Z)
         Y: prepared correct result for X
         """
-        print("debug:backneurals begin")
-        LayerSize = A.getLayerSize()+1
-        cachedLZ = [None]*self.layerSize
+        Log.Debug(NeuralLeafTag,"debug:backneurals begin")
+        LayerSize = A.getLayerSize()
+        cachedLZ = [None]*LayerSize
         l = LayerSize-1
-        results = [None]*LayerSize
+        results = [None]*(LayerSize-1)
         while(l>0):
             al = A[l]
             al_1 = A[l-1]
             DAl_DZl = DADzFunc(al,Z[l])
             if(l == LayerSize-1): # handle last layer of network
-                cachedLZ[l] =  DJDzFunc(al) # DJ/Dz(L) = DJ/Dy*DyDz(L)  y=a(L)
+                cachedLZ[l] =  DJDzFunc(data.Y,al) # DJ/Dz(L) = DJ/Dy*DyDz(L)  y=a(L)
             else:
                 dLdZlP1 = cachedLZ(l+1)
-                cachedLZ = np.matmul(dLdZlP1,np.transpose(self.__matrixs[l]))*DAl_DZl
+                cachedLZ = np.matmul(dLdZlP1,np.transpose(self._matrixs[l]))*DAl_DZl
             al_1_T = np.transpose(al_1)
             results[l-1] = np.matmul(al_1_T,cachedLZ[l])
             l-=1
