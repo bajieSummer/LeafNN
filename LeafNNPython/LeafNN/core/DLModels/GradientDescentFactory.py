@@ -139,8 +139,8 @@ class GradientDescentFactory:
         print("wolfe")
         alpha = initAlpha
         gradPower2 = GradientDescentFactory.layersDot(grad1,grad1)
-        alpha = 1/(1+gradPower2)
-        gradLength = np.sqrt(gradPower2)
+        #alpha = 1/(1+gradPower2)
+        #gradLength = np.sqrt(gradPower2)
       
         J2 = 0
         grad2 = []
@@ -148,7 +148,8 @@ class GradientDescentFactory:
         step = 0
         while (step < maxSearch):
             step +=1
-            deltWb =  GradientDescentFactory.layersMulti(P,alpha)
+            # w = w+alpha*P (P search direction, alpha: learning rate)
+            deltWb = GradientDescentFactory.layersMulti(P,alpha)
             wb_new = GradientDescentFactory.layersPlus(wb,deltWb)
             [J2,grad2] = calCostGrads(wb_new,dataXY)
             print(f"LineSearchWithWolfe_ trainWithLineSearch>> J1={J1},grads1 dldw={grad1[0][0]},grads1 dldb={grad1[1][0]} gradPower2={gradPower2}  p={P[0][0]},p_2={P[1][0]}")
@@ -159,9 +160,7 @@ class GradientDescentFactory:
             if(GradientDescentFactory.FitWolfeCondition2(P,c2,grad1,grad2)):
                 print(f"succeed alpha=",alpha)
                 break
-            alpha = 0.9*alpha
-            
-           
+            alpha = 0.9*alpha           
         return [wb_new,grad2,J2,alpha]
 
   
@@ -184,8 +183,13 @@ class GradientDescentFactory:
         initAlpha = 0.8
           # normalize P
         P0 = GDF.layersMulti(grad1,-1.0)
-        delt = GDF.layersPlus(grad1,GDF.layersMulti(lastGrad,-1.0))
-        beta = GDF.layersDot(lastGrad,delt)/GDF.layersDot(lastGrad,lastGrad)
+        d1 = GDF.layersDot(grad1,grad1)
+        d10 = GDF.layersDot(grad1,lastGrad)
+        d0 = GDF.layersDot(lastGrad,lastGrad)
+        beta = (d1 -d10)/d0
+        # delt = GDF.layersPlus(grad1,GDF.layersMulti(lastGrad,-1.0))
+        # beta = GDF.layersDot(lastGrad,delt)/GDF.layersDot(lastGrad,lastGrad)
+        initAlpha = 1.0/(1.0+d0)
         P = GDF.layersPlus(P0,GDF.layersMulti(lastGrad,beta))
         return GDF.LineSearchWithWolfe(wb,dataXY,calCostGrads,J1,grad1,P,maxSearch,c1,c2,initAlpha,iteralNum)
     
