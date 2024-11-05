@@ -1,3 +1,4 @@
+
 DEBUG_MODE = True
 Is_INIT = False
 #print('hello demoInit')
@@ -14,3 +15,8 @@ if DEBUG_MODE and not Is_INIT:
     sys.path.append(root_dir)
     Is_INIT = True
 
+
+from LeafNN.utils.Log import Log
+from LeafNN.utils.Log import LogOption
+from LeafNN.utils.PathUtils import PathUtils
+Log.config(PathUtils.getLogFolderPath(),LogOption())
