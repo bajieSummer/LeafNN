@@ -8,7 +8,7 @@ from LeafNN.core.LeafModels.TrainOptions import TrainOption as TOps
 from LeafNN.core.FuncFactory.OptimalFuncFactory import OptimalFuncFactory as OptFG
 import LeafNN.core.LeafModels.TrainMonitor  as TMot
 from LeafNN.core.LeafModels.ModelData import ClassifyData
-import matplotlib.pyplot as plt
+
 modelTag = 'BaseClassifyModel'
 class BaseClassifyModel:
     # wb matrix array
