@@ -1,13 +1,14 @@
 import demoInit
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import copy
 from LeafNN.utils.PathUtils import PathUtils 
 import LeafNN.core.DLModels.TrainOptions as tp
 import LeafNN.core.DLModels
 from LeafNN.core.DLModels.BaseModel import BaseModel
 from LeafNN.core.DLModels.SimpleFCModel import SimpleFCModel
-import numpy as np
-import matplotlib.pyplot as plt
-import copy
+from LeafNN.utils.Log import Log
 
 
 def readTrainDataXYFromFile(filePath):
@@ -160,9 +161,9 @@ def initTestBiasAndWeights():
     # expect b = -25.161\n w1 =0.206\n w2 = 0.201 with 400 interation
 
     weights = [None]*1
-    weights[0] = np.array([[0.0],[0.0]]) #[-0.78685205],[-0.96436821] # 0.2,0.2  # 10.0,15.0 strange problem
+    weights[0] = np.array([[100.0],[100.0]]) #[-0.78685205],[-0.96436821] # 0.2,0.2  # 10.0,15.0 strange problem
     bias = [None]*1 
-    bias[0] = np.array([[0.0]])  #-10.0 #[100.0]
+    bias[0] = np.array([[100.0]])  #-10.0 #[100.0]
      
     # testcase3: wrong dldw and checkdw w =1.20092166,1.12628422,b=1.12628422
     # weights =[np.array([[1.20092166],
@@ -186,7 +187,7 @@ logisticModel.testProportion = 0.0
 logisticModel.learnRate =  0.0002 # 0.0015625#
 logisticModel.setData(dataX,dataY)
 logisticModel.initWeights = initTestBiasAndWeights
-logisticModel.maxIterationNum = 10
+logisticModel.maxIterationNum = 80
 logisticModel.enableGradientCheck = True
 logisticModel.gradientCheckFrequency = 1
 logisticModel.enableEarlyStop = False
@@ -194,7 +195,7 @@ monitorOpiton=tp.MonitorOption()
 monitorOpiton.enable = True
 monitorData=tp.MonitorData()
 [initWeights,initBias] = initTestBiasAndWeights()
-complete = logisticModel.train2(monitorOpiton,monitorData)
+complete = logisticModel.train3(monitorOpiton,monitorData)
 [cost,grads]= logisticModel.testCalCostGrad(np.array([[98.05141701],
  [-0.78685205],
  [-0.96436821]]),logisticModel.trainX)
@@ -219,7 +220,8 @@ plotDecisionBoundary(logisticModel.modelWeights,logisticModel.modelBias,logistic
 #plotLearnRates(monitorData)
 # print("monitor data")
 # print(monitorData.iterationInds)
-# print(monitorData.costs)
+Log.Debug("costs=\n",monitorData.costs)
+Log.Debug("rates=\n",monitorData.rates)
 # (rate,testY_p) = logisticModel.test()
 # print("passRate=",rate)
 # print(f"testY_p shape={testY_p.shape},testY shape={logisticModel.testY.shape}")
