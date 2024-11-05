@@ -75,7 +75,7 @@ class Log:
     
     def log(logLevel:LogLevel,logTag,msg):
         if Log.__shareLog is None:
-            print("please call config before use this log function")
+            print("LogError: please call config before use this log function")
             return
         Log.__shareLog.logging(logLevel,logTag,msg)
 
