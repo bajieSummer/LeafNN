@@ -1,0 +1,95 @@
+import numpy as np
+import demoInit
+import os
+from LeafNN.utils.PathUtils import PathUtils 
+from LeafNN.utils.Log import Log
+from LeafNN.utils.DataUtils import DataUtils as DUtils
+from LeafNN.core.LeafModels.BaseClassifyModel import BaseClassifyModel as BCM
+from LeafNN.core.LeafModels.NeuralLeaf import NeuralLeaf
+import LeafNN.core.LeafModels.TrainMonitor as TMot
+LeafBaseTestTag = "LeafBaseModel_Test"
+
+def readData1():
+    file_name = "ex2data1.txt"
+    dataPath = os.path.join(PathUtils.getDemoDatasPath(),file_name)
+    return DUtils.readDataXYFromFile(dataPath)
+
+def testReadSimpleData():
+    data = readData1()
+    X = data.X
+    Y = data.Y
+    XY = np.hstack([X,Y])
+    Log.Debug(LeafBaseTestTag,f"X shape={X.shape}, Y shape={Y.shape}")
+    Log.Debug(LeafBaseTestTag,f"\n x=>\n{XY}")
+
+def testPredictXBeforeTrain():
+    # test case1: with ex2data1.txt
+    # expected dldw = [[2.566, 2.647]] expected dldb =[[0.043] expected cost=0.218]
+    # weights = [None]*1  # bias = [None]*1
+    # weights[0] = np.array([[0.2],[0.2]])  
+    # bias[0] = np.array([[-24.0]])
+    data = readData1()
+    X = data.X
+    Y = data.Y
+    Log.Debug(LeafBaseTestTag,f"X shape={X.shape}, Y shape={Y.shape}")
+    wb_mats =[np.array([[-24.0],[0.2],[0.2]])]
+    wb = NeuralLeaf(wb_mats)
+    (xn,xm) = X.shape
+    model1 = BCM([xm,1],wb)
+    Y_p = model1.predict(X,wb)
+    XYY_p = np.hstack([X,Y,Y_p])
+    Log.Debug(LeafBaseTestTag,f" predict with certain values \n,{XYY_p}")
+
+def testCalCostAndGrad():
+    # test case1:
+    # expected dldw = [[2.566, 2.647]] expected dldb =[[0.043] expected cost=0.218]
+    # wb = (-24.0,0.2,0.2)
+
+    # test case2: with ex2data1.txt
+    # expected dldw =[[-12.0092, -11.2628]] # expected dldb = [[-0.1000]] expected cost = 0.693
+    # wb=(0.0,0.0,0.0)
+    data = readData1()
+    X = data.X
+    Y = data.Y
+    wb_mats =[np.array([[0.0],[0.0],[0.0]])]
+    wb = NeuralLeaf(wb_mats)
+    (xn,xm) = X.shape
+    model1 = BCM([xm,1],wb)
+    cost = model1.calCost(wb,data)
+    Log.Debug(LeafBaseTestTag,f"cost={cost}")
+    grads = model1.calGrads(wb,data)
+    Log.Debug(LeafBaseTestTag,f"grads=\n{grads}")
+    [cost_1,grads_1] =model1.calCostAndGrads(wb,data)
+    Log.Debug(LeafBaseTestTag,f"cost={cost_1},grads=\n{grads_1}")
+
+def testTrain():
+    data = readData1()
+    wb_mats =[np.array([[100.0],[100.0],[100.0]])]
+    wb = NeuralLeaf(wb_mats)
+    (xn,xm) = data.X.shape
+    model1 = BCM([xm,1],wb)
+    model1.trainOption.MaxIteration = 100
+    model1.trainOption.trainRatio = 1.0
+    model1.trainOption.validationRatio = 0.0
+    model1.trainOption.testRatio = 0.0
+    model1.setData(data)
+    monitorOpiton=TMot.MonitorOption()
+    monitorOpiton.enable = True
+    monitorData=TMot.MonitorData()
+    model1.train(monitorOpiton,monitorData)
+    newWb = model1.wb
+    Log.Debug(LeafBaseTestTag,f"afterTrain: newWb=\n {newWb}")
+    finalTrainCost = model1.calCost(newWb,model1.trainData)
+    finalValidCost = model1.calCost(newWb,model1.validateData)
+    finalTestCost = model1.calCost(newWb,model1.testData)
+    Log.Debug(LeafBaseTestTag,f"afterTrain: trainCost={finalTrainCost},validCost={finalValidCost},testCost={finalTestCost}")
+    Log.Debug(LeafBaseTestTag,f"monitorData costs=\n{monitorData.costs} \nrates=\n{monitorData.rates},")
+
+
+def main():
+    Log.Debug(LeafBaseTestTag,"test case run")
+    #testReadSimpleData()
+    #testPredictXBeforeTrain()
+    #testCalCostAndGrad()
+    testTrain()
+main()
