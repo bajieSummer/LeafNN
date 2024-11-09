@@ -13,6 +13,23 @@ from LeafNN.core.LeafModels.ModelData import ClassifyData
 modelTag = 'BaseClassifyModel'
 class BaseClassifyModel:
     # wb matrix array
+
+    def layerCheck(wb:NeuralLeaf,layerNodeSizeList):
+        isSuccess = True
+        if(len(layerNodeSizeList)!=wb.getLayerSize()+1):
+            Log.Error(modelTag,"layerCheck failed, the wb+1 dosen't have the same layers as layerNodeSizeList")
+            isSuccess = False
+        for i in range(wb.getLayerSize()):
+            (m,n)=wb[i].shape
+            if(m!=(layerNodeSizeList[i]+1) or n!=layerNodeSizeList[i+1]):
+                Log.Error(modelTag,f"wb shape doesn't match layerNodeSizeList i={i},shape={wb[i].shape}")
+                isSuccess=False
+            i+=1
+        if isSuccess:
+            return True
+        else:
+            return False
+        
     def __init__(self,layerNodeSizeList,wb:NeuralLeaf=None,trainOption:TOps=None):
         self.layerNodeSizeList = layerNodeSizeList
         self.trainOption = trainOption
@@ -21,7 +38,11 @@ class BaseClassifyModel:
         if(wb is None):
             self.wb = self.randInitializeWb()
         else:
-            self.wb = wb
+            if(not BaseClassifyModel.layerCheck(wb,layerNodeSizeList)):
+                Log.Error(modelTag,"init Failed")
+                self.wb = None
+            else:
+                self.wb = wb
         self.trainData = None
         self.testData = None
         self.validateData = None
@@ -118,10 +139,16 @@ class BaseClassifyModel:
         return [Z,A]
     
     def predict(self,X,wb:NeuralLeaf):
+        if(wb is None or X is None):
+            Log.Error(modelTag,"parameters can't be none (wb,X)")
+            return None
         [Z,A]=self.predictWithCache(X,wb)
         return A[A.getLayerSize()-1]
     
     def calCost(self,wb:NeuralLeaf,dataXY:ClassifyData)->float:
+        if(wb is None or dataXY is None):
+            Log.Error(modelTag,"parameters can't be none (wb,dataXY)")
+            return None
         outputY= self.predict(dataXY.X,wb)
         n = len(outputY)
         if(n>0):
@@ -138,6 +165,9 @@ class BaseClassifyModel:
     return [cost,grads] : type[float,Leaf]
     """
     def calCostAndGrads(self,wb:NeuralLeaf,dataXY:ClassifyData):
+        if(wb is None or dataXY is None):
+            Log.Error(modelTag,"parameters can't be none (wb,dataXY)")
+            return None
         [Z,A] = self.predictWithCache(dataXY.X,wb)
         outputY = A[A.getLayerSize()-1]
         n = len(outputY)
@@ -148,18 +178,18 @@ class BaseClassifyModel:
     def train(self,monitorOption:TMot.MonitorOption=None,outMonitorData:TMot.MonitorData=None):
         # training
         Log.Debug(modelTag,f"train begin>>")
-        trainCompleted = False
         if(self.trainData is None):
             Log.Error(modelTag,"invalid context, there is no train data setted")
-            trainCompleted = False
-            return trainCompleted        
+            return False  
+        if self.wb is None: 
+            Log.Error(modelTag,"train failed wb is None")
+            return False
         [self.wb,mData] = OptFG.OptimalMinWithWolfes(self.calCostAndGrads,self.wb,self.trainOption,monitorOption,self.trainData)
         if(monitorOption and monitorOption.enable):
             TMot.TrainMonitor.monitor(monitorOption,outMonitorData,mData.costs,mData.rates,mData.grads)
             Log.Debug(modelTag,f"final train cost={outMonitorData.costs}")
             Log.Debug(modelTag,f"final train rates={outMonitorData.rates}")
-        trainCompleted = True
-        return trainCompleted
+        return True
 
         
         
