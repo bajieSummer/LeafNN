@@ -14,6 +14,7 @@ from LeafNN.core.DLModels.ModelEvaluation import ModelEvaluation as ME
 from LeafNN.core.FuncFactory.ActiveFuncFactory import ActiveFuncFactory as ActiveF
 from LeafNN.core.FuncFactory.LossFuncFactory import LossFuncFactory as LossF
 from LeafNN.core.DLModels.GradientCheck import GradientCheck
+from LeafNN.utils.Log import Log
 class SimpleFCModel(BaseModel):
     def __init__(self,layerSize,layerNodeSizeList):
         super(SimpleFCModel,self).__init__(layerSize,layerNodeSizeList)
@@ -201,7 +202,12 @@ class SimpleFCModel(BaseModel):
                 cachedLZ = np.matmul(dLdZlP1,np.transpose(self.modelWeights[l]))*DAl_DZl
             al_1_T = np.transpose(al_1)
             self.derivLW[l-1] = np.matmul(al_1_T,cachedLZ[l])
+            # temp = np.ones([1,al.shape[0]])
+            # Log.Debug("TempTest_lZl",f"temp ones=\n{temp}")
+            # Log.Debug("TempTest_lZl",f"cacheLZ l=\n{cachedLZ[l]}")
+            # Log.Debug("TempTest_lZl",f"al_1_T l=\n{al_1_T}")
             self.derivLB[l-1] =  np.matmul(np.ones([1,al.shape[0]]),cachedLZ[l])
+            #Log.Debug("TempTest_lZl",f"dJdb=\n{self.derivLB[l-1]},djdw={self.derivLW[l-1]}")
             l-=1
         print("debug:backneurals end")
   
