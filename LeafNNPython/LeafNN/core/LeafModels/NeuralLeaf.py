@@ -1,4 +1,5 @@
-import numpy as np
+from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+#import numpy as np
 from LeafNN.utils.Log import Log
 from LeafNN.core.LeafModels.Leaf import Leaf
 NeuralLeafTag = "NeuralLeafTag"
@@ -7,8 +8,8 @@ class NeuralLeaf(Leaf):
         super().__init__(matrixArray)
     
     def XAddOnes(X):
-        ones_x = np.ones([X.shape[0],1])
-        X = np.hstack([ones_x,X])
+        ones_x = MM.ones([X.shape[0],1])*1.0
+        X = MM.hstack([ones_x,X])
         return X
     
     """
@@ -26,7 +27,9 @@ class NeuralLeaf(Leaf):
         layerSize = self.getLayerSize()
         l = 0
         for mat in self._matrixs:
-            z = np.dot(lastA,mat)
+            #todo why would it save time of training?
+            z = MM.dot(lastA,mat)
+            #z = MM.matmul(lastA,mat)
             z_matrixs.append(z)
             a =activeFunc(z)
             l+=1
@@ -55,7 +58,7 @@ class NeuralLeaf(Leaf):
         A: A = active(Z)
         Y: prepared correct result for X
         """
-        Log.Debug(NeuralLeafTag,"debug:backneurals begin")
+        #Log.Debug(NeuralLeafTag,"debug:backneurals begin")
         LayerSize = A.getLayerSize()
         cachedLZ = [None]*LayerSize
         l = LayerSize-1
@@ -68,9 +71,24 @@ class NeuralLeaf(Leaf):
                 cachedLZ[l] =  DJDzFunc(data.Y,al) # DJ/Dz(L) = DJ/Dy*DyDz(L)  y=a(L)
             else:
                 dLdZlP1 = cachedLZ(l+1)
-                cachedLZ = np.matmul(dLdZlP1,np.transpose(self._matrixs[l]))*DAl_DZl
-            al_1_T = np.transpose(al_1)
-            results[l-1] = np.matmul(al_1_T,cachedLZ[l])
+                cachedLZ = MM.matmul(dLdZlP1,MM.transpose(self._matrixs[l]))*DAl_DZl
+            al_1_T = MM.transpose(al_1)
+            #Log.Debug("TempTest_lZl",f"temp ones=\n{al_1_T[0]}")
+            #Log.Debug("TempTest_lZl",f"cacheLZ l=\n{cachedLZ[l]}")
+            #Log.Debug("TempTest_lZl",f"al_1_T l=\n{al_1_T[1:]}")
+            results[l-1] = MM.matmul(al_1_T,cachedLZ[l])
+            # temp = np.ones([1,al.shape[0]])
+            # check1 = np.matmul(temp,cachedLZ[l])
+            #checkdjdb = MM.matmul(al_1_T[0]*1.0,cachedLZ[l])
+            #checkdjdw12 = MM.matmul(al_1_T[1:],cachedLZ[l])
+            # results[l-1][0] = checkdjdb
+            # results[l-1][1] = MM.matmul(al_1_T[1:2],cachedLZ[l])
+            # results[l-1][2] = MM.matmul(al_1_T[2:3],cachedLZ[l])
+
+            # results[l-1][1] = checkdjdw12[0]
+            # results[l-1][2] = checkdjdw12[1]
+            #Log.Debug("TempTest_lZl",f"dJdb\n{results[l-1]},check1={checkdjdb},checkdjdw12={checkdjdw12} ")
+            
             l-=1
         return Leaf(results)
     
