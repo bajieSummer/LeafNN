@@ -104,7 +104,8 @@ class MathMatrix:
         else:
             return False
 
-   
+    def set_printoptions(precision,suppress):
+        np.set_printoptions(precision, suppress)
 
         
 # # Store the original np.array function

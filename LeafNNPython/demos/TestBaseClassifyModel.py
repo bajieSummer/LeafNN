@@ -1,6 +1,6 @@
 import demoInit
-import LeafNN.core.Bases.MathMatrix
-import numpy as np
+from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+#import numpy as np
 import os
 from LeafNN.utils.PathUtils import PathUtils 
 from LeafNN.utils.Log import Log
@@ -20,7 +20,7 @@ def testReadSimpleData():
     data = readData1()
     X = data.X
     Y = data.Y
-    XY = np.hstack([X,Y])
+    XY = MM.hstack([X,Y])
     Log.Debug(LeafBaseTestTag,f"X shape={X.shape}, Y shape={Y.shape}")
     Log.Debug(LeafBaseTestTag,f"\n x=>\n{XY}")
     MV.plotData(X,Y)
@@ -37,12 +37,12 @@ def testPredictXBeforeTrain():
     X = data.X
     Y = data.Y
     Log.Debug(LeafBaseTestTag,f"X shape={X.shape}, Y shape={Y.shape}")
-    wb_mats =[np.array([[0.0],[0.0],[0.0]])]# -24.0 0.2,0.2
+    wb_mats =[MM.array([[0.0],[0.0],[0.0]])]# -24.0 0.2,0.2
     wb = NeuralLeaf(wb_mats)
     (xn,xm) = X.shape
     model1 = BCM([xm,1],wb)
     Y_p = model1.predict(X,wb)
-    XYY_p = np.hstack([X,Y,Y_p])
+    XYY_p = MM.hstack([X,Y,Y_p])
     Log.Debug(LeafBaseTestTag,f" predict with certain values \n,{XYY_p}")
     indsStart = 2
     indsEnd = 10
@@ -59,7 +59,7 @@ def testCalCostAndGrad():
     data = readData1()
     X = data.X
     Y = data.Y
-    wb_mats =[np.array([[0.0],[0.0],[0.0]])]
+    wb_mats =[MM.array([[0.0],[0.0],[0.0]])]
     wb = NeuralLeaf(wb_mats)
     (xn,xm) = X.shape
     model1 = BCM([xm,1],wb)
@@ -73,7 +73,7 @@ def testCalCostAndGrad():
 def testTrain():
     data = readData1()
     MV.plotData(data.X,data.Y,"All Datas")
-    wb_mats =[np.array([[1000.0],[1000.0],[1000.0]])]
+    wb_mats =[MM.array([[1000.0],[1000.0],[1000.0]])]
     wb = NeuralLeaf(wb_mats)
     (xn,xm) = data.X.shape
     model1 = BCM([xm,1],wb)
@@ -101,7 +101,9 @@ def testTrain():
     finalTestCost = model1.calCost(newWb,model1.testData)
     Log.Debug(LeafBaseTestTag,f"afterTrain: trainCost={finalTrainCost},validCost={finalValidCost},testCost={finalTestCost}")
     Log.Debug(LeafBaseTestTag,f"monitorData costs=\n{monitorData.costs} \nrates=\n{monitorData.rates},")
-np.set_printoptions(precision=20, suppress=True)
+
+
+MM.set_printoptions(precision=20, suppress=True)
 def main():
     Log.Debug(LeafBaseTestTag,"test case run")
 
