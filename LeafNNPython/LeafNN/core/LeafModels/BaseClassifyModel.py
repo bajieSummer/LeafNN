@@ -1,4 +1,5 @@
-import numpy as np
+from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+# import numpy as np
 from LeafNN.core.LeafModels.Leaf import Leaf
 from LeafNN.core.LeafModels.NeuralLeaf import NeuralLeaf
 from LeafNN.core.FuncFactory.ActiveFuncFactory import ActiveFuncFactory as ActiveF
@@ -44,7 +45,7 @@ class BaseClassifyModel:
         l = 0
         while(l < self.layerSize - 1):
             # self.layerNodeSizeList[l]+1, +1 for bias
-            WBmats[l] = np.random.rand(self.layerNodeSizeList[l]+1,self.layerNodeSizeList[l+1])
+            WBmats[l] = MM.rand(self.layerNodeSizeList[l]+1,self.layerNodeSizeList[l+1])
             l+=1
 
     def setData(self,data:ClassifyData):
@@ -124,7 +125,7 @@ class BaseClassifyModel:
         outputY= self.predict(dataXY.X,wb)
         n = len(outputY)
         if(n>0):
-            cost = 1.0/n*np.sum(self.Loss(dataXY.Y,outputY))
+            cost = 1.0/n*MM.sum(self.Loss(dataXY.Y,outputY))
         else:
             cost = 0
         return cost
@@ -140,7 +141,7 @@ class BaseClassifyModel:
         [Z,A] = self.predictWithCache(dataXY.X,wb)
         outputY = A[A.getLayerSize()-1]
         n = len(outputY)
-        cost = 1.0/n*np.sum(self.Loss(dataXY.Y,outputY))
+        cost = 1.0/n*MM.sum(self.Loss(dataXY.Y,outputY))
         grads = wb.backward(Z,A,self.derivActive,self.__DJDy,dataXY)
         return[cost,grads]
 
