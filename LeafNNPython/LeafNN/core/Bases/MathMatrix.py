@@ -52,19 +52,19 @@ class MathMatrix:
     def matmul(a, b):
         """Perform matrix multiplication and return the result as float128."""
         return np.matmul(a, b)
-        # (m,n) = a.shape
-        # (n1,mt) = b.shape
-        # res = MathMatrix.zeros([m,mt])
-        # for i in range(m):
-        #     for j in range(mt):
-        #         res[i][j] = 0
-        #         for t in range(n):
-        #             res[i][j]+= a[i][t]*b[t][j]
-        # return res
-                
-            
-        #return result.astype(MathMatrix.default_Type)  # Convert to float128
-        
+        #return MathMatrix.matmulS(a,b)
+    
+    def matmulS(a,b):
+        (m,n) = a.shape
+        (n1,mt) = b.shape
+        res = MathMatrix.zeros([m,mt])
+        for i in range(m):
+            for j in range(mt):
+                res[i][j] = 0
+                for t in range(n):
+                    res[i][j]+= a[i][t]*b[t][j]
+        return res
+
     def abs(arr):
         """Compute the absolute value and return as float128."""
         return np.abs(arr)

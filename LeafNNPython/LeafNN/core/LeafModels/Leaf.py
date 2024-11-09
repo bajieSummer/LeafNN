@@ -108,8 +108,8 @@ class Leaf:
             i = 0
             for mat in self._matrixs:
                 # todo why would it save time?
-                result += MM.sum(mat*other[i])
-                #result +=MM.sum( MM.matmul(MM.transpose(mat),other[i]) )
+                #result += MM.sum(mat*other[i])
+                result +=MM.sum( MM.matmulS(MM.transpose(mat),other[i]) )
                 #result += np.sum(np.dot(np.transpose(mat),other[i]))
                 i=i+1
         else:
@@ -134,9 +134,9 @@ class Leaf:
                 Log.Error(LeafTag,"Leaf multiplication should have the same layers")
             i = 0
             for mat in self._matrixs:
-                # todo why would it save time?
-                #resultMats.append(MM.matmul(mat,other.getMatrix(i)))
-                resultMats.append(MM.dot(mat,other.getMatrix(i)))
+                # todo why would it save time? and make success
+                resultMats.append(MM.matmulS(mat,other.getMatrix(i)))
+                #resultMats.append(MM.dot(mat,other.getMatrix(i)))
                 i=i+1
         if(success):
             return self._createInstance(resultMats)

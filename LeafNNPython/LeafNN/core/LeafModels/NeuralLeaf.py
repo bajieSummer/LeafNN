@@ -27,9 +27,9 @@ class NeuralLeaf(Leaf):
         layerSize = self.getLayerSize()
         l = 0
         for mat in self._matrixs:
-            #todo why would it save time of training?
-            z = MM.dot(lastA,mat)
-            #z = MM.matmul(lastA,mat)
+            #todo why would it save time of training? and make it converge, (not fail)
+            #z = MM.dot(lastA,mat)
+            z = MM.matmulS(lastA,mat)
             z_matrixs.append(z)
             a =activeFunc(z)
             l+=1
@@ -76,7 +76,8 @@ class NeuralLeaf(Leaf):
             #Log.Debug("TempTest_lZl",f"temp ones=\n{al_1_T[0]}")
             #Log.Debug("TempTest_lZl",f"cacheLZ l=\n{cachedLZ[l]}")
             #Log.Debug("TempTest_lZl",f"al_1_T l=\n{al_1_T[1:]}")
-            results[l-1] = MM.matmul(al_1_T,cachedLZ[l])
+            #todo why would it save time? and make success
+            results[l-1] = MM.matmulS(al_1_T,cachedLZ[l])
             # temp = np.ones([1,al.shape[0]])
             # check1 = np.matmul(temp,cachedLZ[l])
             #checkdjdb = MM.matmul(al_1_T[0]*1.0,cachedLZ[l])
