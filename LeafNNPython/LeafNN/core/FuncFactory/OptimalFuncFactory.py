@@ -1,4 +1,5 @@
-import numpy as np
+from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+#import numpy as np
 from LeafNN.core.LeafModels.TrainOptions import TrainOption as TOps
 import LeafNN.core.LeafModels.TrainMonitor as TMot
 from LeafNN.utils.Log import Log
@@ -69,7 +70,7 @@ class OptimalFuncFactory:
             Log.Debug("testTrain",f"beginSearch i={i} f1/f0={f0},f2/f1={f1} z1/a0={a0} d1/d0={d0} d2/d1={d1} s0={s0} df2/df1={df1} X={X}")
 
             while j <trainOption.MaxLineSearch:
-                nanCost = np.isnan(f1) or np.isnan(f0)
+                nanCost = MM.isnan(f1) or MM.isnan(f0)
                 # = is for f=inf 
                 wolfe1 = f1<=f0+c1*a0*d0 
                 wolfe2_lower = d1>=c2*d0
@@ -82,9 +83,9 @@ class OptimalFuncFactory:
                     else:
                         A = 6*(f1-f2)/a2+3*(d1+d2)
                         B = 3*(f2-f1)-a2*(d2+2*d1)
-                        a1 = (np.sqrt(B*B-A*d1*a2*a2)-B)/A
+                        a1 = (MM.sqrt(B*B-A*d1*a2*a2)-B)/A
                         Log.Debug("testTrain",f"here1 i={i} j={j} A={A},B={B} z2/a1={a1},z3/a2={a2},d3/d2={d2}")
-                    if np.isnan(a1) or np.isinf(a1):
+                    if MM.isnan(a1) or MM.isinf(a1):
                         a1 = a2/2.0
                     a1 = max(min(a1,INT*a2),(1-INT)*a2)
                     a0 = a0 + a1
@@ -104,9 +105,9 @@ class OptimalFuncFactory:
                     A = 6.0*(f1-f2)/a2+3.0*(d1+d2)
                     B = 3.0*(f2-f1)-a2*(d2+2*d1)
                     Log.Debug("testTrain",f"right_here4 i={i} j={j},A={A},B={B} f2/f1={f1},f3/f2={f2},z1/a0 ={a0} d1/d0 = {d0} c1={c1} c2={c2} z3/a2={a2},d2/d1={d1},d3/d2={d2}")
-                    a1 = -d1*a2*a2/(B+np.sqrt(B*B-A*d1*a2*a2))
+                    a1 = -d1*a2*a2/(B+MM.sqrt(B*B-A*d1*a2*a2))
                     Log.Debug("testTrain",f"right_here5 i={i} j={j},update z2/a1 ={a1}")
-                    if not np.isreal(a1) or np.isnan(a1) or np.isinf(a1) or a1<0:
+                    if not MM.isreal(a1) or MM.isnan(a1) or MM.isinf(a1) or a1<0:
                         if limit < -0.5:
                             a1 = a0*(EXT-1.0)
                         else:
@@ -147,7 +148,7 @@ class OptimalFuncFactory:
                     s1 = -1.0*df0
                     #d1 = -1.0*GDF.dot(s1,s1)
                     d1 = -1.0*(s1*s1)
-                a0 = a0 *min(RATIO,d0/(d1-np.finfo(float).eps))  # it will faster its converge
+                a0 = a0 *min(RATIO,d0/(d1-MM.finfo(float).eps))  # it will faster its converge
                 d0 = d1
                 Log.Debug("testTrain",f"here7 after:i={i} j={j} z1/a0={a0},d1/d0={d0},z2/a1={a1},z3/a2={a2}")
                 ls_failed = 0   
