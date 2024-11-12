@@ -65,13 +65,16 @@ class NeuralLeaf(Leaf):
         results = [None]*(LayerSize-1)
         while(l>0):
             al = A[l]
+            # not last layer should remove addOne todo
+            if (l!=(LayerSize-1)):
+                al=A[l][:,1:]
             al_1 = A[l-1]
             DAl_DZl = DADzFunc(al,Z[l])
-            if(l == LayerSize-1): # handle last layer of network
+            if(l == LayerSize-1): # handle last layer of network todo
                 cachedLZ[l] =  DJDzFunc(data.Y,al) # DJ/Dz(L) = DJ/Dy*DyDz(L)  y=a(L)
             else:
-                dLdZlP1 = cachedLZ(l+1)
-                cachedLZ = MM.matmul(dLdZlP1,MM.transpose(self._matrixs[l]))*DAl_DZl
+                dLdZlP1 = cachedLZ[l+1]
+                cachedLZ[l] = MM.matmul(dLdZlP1,MM.transpose(self._matrixs[l][1:]))*DAl_DZl
             al_1_T = MM.transpose(al_1)
             #Log.Debug("TempTest_lZl",f"temp ones=\n{al_1_T[0]}")
             #Log.Debug("TempTest_lZl",f"cacheLZ l=\n{cachedLZ[l]}")
