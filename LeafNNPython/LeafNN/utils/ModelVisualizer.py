@@ -115,13 +115,15 @@ class ModelVisualizer:
             return
 
         lastCost = costs[length-1]
-        title = f"cost/iterations lastC={lastCost}"
+        title = f"lastC={lastCost:.4f}"
         if(initWB is not None):
-            title=f"{title},initWb={initWB}"
+            title=f"{title},initbw0={initWB[0][0][0]:.2f},{initWB[0][1][0]:.2f}"
         if(newWB is not None):
-            title = f"{title},newWB={newWB}"
+            title = f"{title},newbw0={newWB[0][0][0]:.2f},{newWB[0][1][0]:.2f}"
         plt.title(title)
         plt.scatter(inds,costs,color='orange',marker='s',label ='cost')
+        plt.xlabel('costs')
+        plt.ylabel('iteration')
         # Add a legend
         plt.legend()
         # Display the plot
