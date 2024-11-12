@@ -103,6 +103,13 @@ class MathMatrix:
             return True
         else:
             return False
+    
+    def inf():
+        return np.inf
+    
+    def isClose(a,b):
+        return np.isclose(a,b)
+    
 
     def set_printoptions(precision,suppress):
         np.set_printoptions(precision, suppress)
