@@ -107,16 +107,21 @@ MM.set_printoptions(precision=20, suppress=True)
 
 def testMultiLayerNN():
     data = readData1()
+    data.X = DUtils.preprocessData(data.X,True,3)
     MV.plotData(data.X,data.Y,"All Datas")
-    wb_mats =[]
-    initV = 0.0
-    wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
-    #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
-    wb_mats.append(MM.array([[1.0],[1.0],[1.0]])*initV)
-    wb = NeuralLeaf(wb_mats)
     (xn,xm) = data.X.shape
-    model1 = BCM([xm,2,1],wb)
-    model1.trainOption.MaxIteration = 300
+    wb_mats =[]
+    initV = 1.0
+    #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
+    #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
+    #wb_mats.append(MM.array([[1.0],[1.0],[1.0]])*initV)
+    layerSizeList = [xm,3,2,1]
+    for l in range(len(layerSizeList)-1):
+        wb_mats.append(MM.ones([layerSizeList[l]+1,layerSizeList[l+1]])*initV)
+    wb = NeuralLeaf(wb_mats)    
+    model1 = BCM(layerSizeList,wb)
+    #wb =model1.wb
+    model1.trainOption.MaxIteration = 100
     model1.trainOption.trainRatio = 1.0
     model1.trainOption.validationRatio = 0.0
     model1.trainOption.testRatio = 0.0
@@ -132,7 +137,8 @@ def testMultiLayerNN():
     testX = data.X[startInds:endInds]
     testY = data.Y[startInds:endInds]
     Y_p=model1.predict(testX,model1.wb)
-    MV.plot2DDecisionBoundaryWithTestCase(newWb,data.X,data.Y,testX,testY,Y_p)
+    #MV.plot2DDecisionBoundaryWithTestCase(newWb,data.X,data.Y,testX,testY,Y_p)
+    MV.plotDataWithTestCase(data.X,data.Y,testX,testY,Y_p)
     # more debug info
     Log.Debug(LeafBaseTestTag,f"afterTrain: newWb=\n {newWb}")
     finalTrainCost = model1.calCost(newWb,model1.trainData)
