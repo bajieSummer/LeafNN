@@ -36,7 +36,7 @@ class BaseClassifyModel:
         if(self.trainOption is None):
             self.trainOption = TOps()
         if(wb is None):
-            self.wb = self.randInitializeWb()
+            self.wb = self.randInitializeWb(layerNodeSizeList)
         else:
             if(not BaseClassifyModel.layerCheck(wb,layerNodeSizeList)):
                 Log.Error(modelTag,"init Failed")
@@ -62,12 +62,14 @@ class BaseClassifyModel:
         #     self.modelWeights[l] = np.random.rand(self.layerNodeSizeList[l],self.layerNodeSizeList[l+1])
         #     self.modelBias[l] = np.random.rand(1,self.layerNodeSizeList[l+1])
         #     l+=1
-        WBmats = [None]*(self.layerSize-1)
+        layerSize = len(layerNodeSizeList)
+        WBmats = [None]*(layerSize-1)
         l = 0
-        while(l < self.layerSize - 1):
+        while(l < layerSize - 1):
             # self.layerNodeSizeList[l]+1, +1 for bias
             WBmats[l] = MM.rand(self.layerNodeSizeList[l]+1,self.layerNodeSizeList[l+1])
             l+=1
+        return NeuralLeaf(WBmats)
 
     def setData(self,data:ClassifyData):
         if(data.X.shape[0]!=data.Y.shape[0]):
