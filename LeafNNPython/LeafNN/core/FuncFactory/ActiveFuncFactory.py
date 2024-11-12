@@ -1,4 +1,4 @@
-from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+from LeafNN.Bases.MathMatrix import MathMatrix as MM
 #import numpy as np
 class ActiveFuncFactory:
     def Sigmoid(X):

@@ -1,4 +1,4 @@
-from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+from LeafNN.Bases.MathMatrix import MathMatrix as MM
 from LeafNN.utils.Log import Log
 #import numpy as np
 LeafTag = "Leaf"

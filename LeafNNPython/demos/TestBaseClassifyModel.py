@@ -1,5 +1,5 @@
 import demoInit
-from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+from LeafNN.Bases.MathMatrix import MathMatrix as MM
 #import numpy as np
 import os
 from LeafNN.utils.PathUtils import PathUtils 

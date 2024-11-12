@@ -1,4 +1,4 @@
-from LeafNN.core.Bases.MathMatrix import MathMatrix as MM
+from LeafNN.Bases.MathMatrix import MathMatrix as MM
 # import numpy as np
 from LeafNN.core.LeafModels.Leaf import Leaf
 from LeafNN.core.LeafModels.NeuralLeaf import NeuralLeaf
