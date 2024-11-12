@@ -73,7 +73,7 @@ def testCalCostAndGrad():
 def testTrain():
     data = readData1()
     MV.plotData(data.X,data.Y,"All Datas")
-    wb_mats =[MM.array([[1000.0],[1000.0],[1000.0]])]
+    wb_mats =[MM.array([[0.0],[0.0],[0.0]])]
     wb = NeuralLeaf(wb_mats)
     (xn,xm) = data.X.shape
     model1 = BCM([xm,1],wb)
@@ -104,13 +104,50 @@ def testTrain():
 
 
 MM.set_printoptions(precision=20, suppress=True)
+
+def testMultiLayerNN():
+    data = readData1()
+    MV.plotData(data.X,data.Y,"All Datas")
+    wb_mats =[]
+    initV = 0.0
+    wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
+    #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
+    wb_mats.append(MM.array([[1.0],[1.0],[1.0]])*initV)
+    wb = NeuralLeaf(wb_mats)
+    (xn,xm) = data.X.shape
+    model1 = BCM([xm,2,1],wb)
+    model1.trainOption.MaxIteration = 300
+    model1.trainOption.trainRatio = 1.0
+    model1.trainOption.validationRatio = 0.0
+    model1.trainOption.testRatio = 0.0
+    model1.setData(data)
+    monitorOpiton=TMot.MonitorOption()
+    monitorOpiton.enable = True
+    monitorData=TMot.MonitorData()
+    model1.train(monitorOpiton,monitorData)
+    newWb = model1.wb
+    MV.plotCostWithWB(monitorData.iterationInds,monitorData.costs,wb,newWb)
+    startInds = 2
+    endInds = 10
+    testX = data.X[startInds:endInds]
+    testY = data.Y[startInds:endInds]
+    Y_p=model1.predict(testX,model1.wb)
+    MV.plot2DDecisionBoundaryWithTestCase(newWb,data.X,data.Y,testX,testY,Y_p)
+    # more debug info
+    Log.Debug(LeafBaseTestTag,f"afterTrain: newWb=\n {newWb}")
+    finalTrainCost = model1.calCost(newWb,model1.trainData)
+    finalValidCost = model1.calCost(newWb,model1.validateData)
+    finalTestCost = model1.calCost(newWb,model1.testData)
+    Log.Debug(LeafBaseTestTag,f"afterTrain: trainCost={finalTrainCost},validCost={finalValidCost},testCost={finalTestCost}")
+    Log.Debug(LeafBaseTestTag,f"monitorData costs=\n{monitorData.costs} \nrates=\n{monitorData.rates},")
+    
 def main():
     Log.Debug(LeafBaseTestTag,"test case run")
 
     #testReadSimpleData()
     #testPredictXBeforeTrain()
     #testCalCostAndGrad()
-    testTrain()
+    testMultiLayerNN()
 
     #data visual flow-> 
     # before train: dataXY --> 
