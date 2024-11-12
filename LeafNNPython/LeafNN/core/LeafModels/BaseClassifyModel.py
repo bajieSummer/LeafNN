@@ -22,7 +22,7 @@ class BaseClassifyModel:
         for i in range(wb.getLayerSize()):
             (m,n)=wb[i].shape
             if(m!=(layerNodeSizeList[i]+1) or n!=layerNodeSizeList[i+1]):
-                Log.Error(modelTag,f"wb shape doesn't match layerNodeSizeList i={i},shape={wb[i].shape}")
+                Log.Error(modelTag,f"wb shape doesn't match layerNodeSizeList i={i},wb_shape={wb[i].shape},layerNodeSizeList={layerNodeSizeList}")
                 isSuccess=False
             i+=1
         if isSuccess:
