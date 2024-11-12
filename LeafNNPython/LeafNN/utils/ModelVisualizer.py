@@ -122,8 +122,8 @@ class ModelVisualizer:
             title = f"{title},newbw0={newWB[0][0][0]:.2f},{newWB[0][1][0]:.2f}"
         plt.title(title)
         plt.scatter(inds,costs,color='orange',marker='s',label ='cost')
-        plt.xlabel('costs')
-        plt.ylabel('iteration')
+        plt.xlabel('iteration')
+        plt.ylabel('cost')
         # Add a legend
         plt.legend()
         # Display the plot
