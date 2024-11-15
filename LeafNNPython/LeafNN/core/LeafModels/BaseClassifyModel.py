@@ -147,34 +147,49 @@ class BaseClassifyModel:
         [Z,A]=self.predictWithCache(X,wb)
         return A[A.getLayerSize()-1]
     
+    def __calCostFromY(self,wb:NeuralLeaf,Y,Y_predict):
+        n = len(Y_predict)
+        if(n>0):
+            cost = 1.0/n*MM.sum(self.Loss(Y,Y_predict))
+            if self.trainOption.regularEnable:
+                cost += self.trainOption.regularLamada/(2*n)*(wb*wb)
+        else:
+            cost = 0
+        
+        return cost
+    
     def calCost(self,wb:NeuralLeaf,dataXY:ClassifyData)->float:
         if(wb is None or dataXY is None):
             Log.Error(modelTag,"parameters can't be none (wb,dataXY)")
             return None
         outputY= self.predict(dataXY.X,wb)
-        n = len(outputY)
-        if(n>0):
-            cost = 1.0/n*MM.sum(self.Loss(dataXY.Y,outputY))
-        else:
-            cost = 0
+        cost = self.__calCostFromY(wb,dataXY.Y,outputY)
         return cost
-       
+
+    def __calGradsFromCache(self,wb:NeuralLeaf,dataXY:ClassifyData,Z,A):
+        grads = wb.backward(Z,A,self.derivActive,self.__DJDy,dataXY)
+        if self.trainOption.regularEnable:
+            m = len(dataXY.Y)
+            grads += self.trainOption.regularLamada*1/m*wb
+        return grads  
+              
     def calGrads(self,wb:NeuralLeaf,dataXY:ClassifyData)->Leaf:
         [Z,A] = self.predictWithCache(dataXY.X,wb)
-        return wb.backward(Z,A,self.derivActive,self.__DJDy,dataXY)
+        grads = self.__calGradsFromCache(wb,dataXY,Z,A)
+        return grads
 
-    """
-    return [cost,grads] : type[float,Leaf]
-    """
+  
     def calCostAndGrads(self,wb:NeuralLeaf,dataXY:ClassifyData):
+        """
+        return [cost,grads] : type[float,Leaf]
+        """
         if(wb is None or dataXY is None):
             Log.Error(modelTag,"parameters can't be none (wb,dataXY)")
             return None
         [Z,A] = self.predictWithCache(dataXY.X,wb)
         outputY = A[A.getLayerSize()-1]
-        n = len(outputY)
-        cost = 1.0/n*MM.sum(self.Loss(dataXY.Y,outputY))
-        grads = wb.backward(Z,A,self.derivActive,self.__DJDy,dataXY)
+        cost = self.__calCostFromY(wb,dataXY.Y,outputY)
+        grads = self.__calGradsFromCache(wb,dataXY,Z,A)
         return[cost,grads]
 
     def train(self,monitorOption:TMot.MonitorOption=None,outMonitorData:TMot.MonitorData=None):
