@@ -9,6 +9,10 @@ class TrainOption:
         self.EXT = 3.0
         self.RATIO = 100
         self.learnRate = 0.001
+        # regularization part 
+        self.regularEnable = True
+        self.regularLamada = 0.0
+
         #early stop
         self.enableEarlyStop = False
         self.ESTFrequency = 100
