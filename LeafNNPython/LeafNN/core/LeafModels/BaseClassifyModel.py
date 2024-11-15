@@ -153,6 +153,11 @@ class BaseClassifyModel:
             cost = 1.0/n*MM.sum(self.Loss(Y,Y_predict))
             if self.trainOption.regularEnable:
                 cost += self.trainOption.regularLamada/(2*n)*(wb*wb)
+                # why we should minus bias*bias?
+                biasM = 0
+                for i in range(wb.getLayerSize()):
+                    biasM+=MM.sum(wb[i][0]*wb[i][0])
+                cost -=self.trainOption.regularLamada/(2*n)*biasM
         else:
             cost = 0
         
@@ -170,7 +175,13 @@ class BaseClassifyModel:
         grads = wb.backward(Z,A,self.derivActive,self.__DJDy,dataXY)
         if self.trainOption.regularEnable:
             m = len(dataXY.Y)
-            grads += self.trainOption.regularLamada*1/m*wb
+            gradReg = self.trainOption.regularLamada*1/m*wb
+            # why regularization doesn't consider bias?
+            for i in range(wb.getLayerSize()):
+                n = len(gradReg[i][0])
+                for j in range(n):
+                    gradReg[i][0][j] = 0
+            grads +=gradReg
         return grads  
               
     def calGrads(self,wb:NeuralLeaf,dataXY:ClassifyData)->Leaf:
