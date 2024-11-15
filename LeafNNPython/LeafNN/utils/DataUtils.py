@@ -60,22 +60,61 @@ class DataUtils:
             i+=1
         return resX
 
+    def getPolyX1X2(HightestPolyDegree,index1,index2,XPolys):
+        i = 2
+        res = None
+        while (i <= HightestPolyDegree):
+            j = 0
+            while (j<=i):
+                #X1^(i-j)*X2^j
+                T = (XPolys[i-j][:,index1]*XPolys[j][:,index2])[:,MM.newaxis]
+                if(res is None):
+                    res = T
+                else:
+                    res = MM.hstack([res,T])
+                j+=1
+            i+=1
+        return res
+
+
+
+
     # tod first normalize then multiPolyDegree?
-    """
-    isNormalize: should normalize the columns
-    HighestPolyDegree: should >=1 should be integer
-    """  
-    def preprocessData(X_input,isNormalize,HighestPolyDegree):
-        X = MM.ones(X_input.shape)
+    def preprocessData(X_input,isNormalize,HighestPolyDegree,cross=True):
+        """
+        isNormalize: should normalize the columns
+        HighestPolyDegree: should >=1 should be integer
+        cross: x1*x1 x1*x2 x2*x2, x1*x2 is the cross
+        """ 
+        X = X_input
+        [m,n]=X_input.shape
         if isNormalize:
             X = DataUtils.normalizeColumn(X_input)
-        i = 1
+       
         Xmul = X
         resX = X
-        while i < HighestPolyDegree:
+        XPolys = [MM.ones(X.shape),X]
+        ip = 2
+        while ip <= HighestPolyDegree:
             Xmul = Xmul*X
-            resX = MM.hstack([resX,Xmul])
-            i+=1
+            XPolys.append(Xmul)
+            ip+=1
+        if cross:
+            id1 = 0
+            while id1 < n:
+                id2=id1+1
+                while id2 <n:
+                    T = DataUtils.getPolyX1X2(HighestPolyDegree,id1,id2,XPolys)
+                    resX = MM.hstack([resX,T])
+                    id2+=1
+                id1+=1
+        else:
+            i=2
+            while i <= HighestPolyDegree:
+                resX = MM.hstack([resX,XPolys[i]])
+                i+=1
+        #n features  x1 x2 x3
+        # if Hpoly=2  x1,x2 x1*x2,x1*x1 x1*x2 x1*
         return resX
 
             
