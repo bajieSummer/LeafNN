@@ -2,6 +2,7 @@
 import numpy as np
 
 class MathMatrix:
+    newaxis = np.newaxis
     default_Type = np.float64
     def array(*args, **kwargs):
         return np.array(*args, dtype=MathMatrix.default_Type, **kwargs)
@@ -74,10 +75,15 @@ class MathMatrix:
         """Horizontally stack arrays and return as float128."""
         return np.hstack(tup)
         #return result.astype(MathMatrix.default_Type)  # Convert to float128
+
+    def vstack(tup):
+        return np.vstack(tup)
         
     def transpose(arr, axes=None):
         """Transpose an array and return it."""
         return np.transpose(arr, axes=axes)
+    
+    
 
     def finfo(dtype=None):
         """Return floating-point information for the specified dtype."""
@@ -111,8 +117,8 @@ class MathMatrix:
         return np.isclose(a,b)
     
 
-    def set_printoptions(precision,suppress):
-        np.set_printoptions(precision, suppress)
+    def set_printoptions(precision,suppress,threshold):
+        np.set_printoptions(precision=precision, suppress=suppress, threshold=threshold)
 
         
 # # Store the original np.array function
