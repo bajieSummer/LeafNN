@@ -16,6 +16,11 @@ def readData1():
     dataPath = os.path.join(PathUtils.getDemoDatasPath(),file_name)
     return DUtils.readDataXYFromFile(dataPath)
 
+def readData2():
+    file_name = "ex2data2.txt"
+    dataPath = os.path.join(PathUtils.getDemoDatasPath(),file_name)
+    return DUtils.readDataXYFromFile(dataPath)
+
 def testReadSimpleData():
     data = readData1()
     X = data.X
@@ -103,11 +108,11 @@ def testTrain():
     Log.Debug(LeafBaseTestTag,f"monitorData costs=\n{monitorData.costs} \nrates=\n{monitorData.rates},")
 
 
-MM.set_printoptions(precision=20, suppress=True)
+MM.set_printoptions(precision=20, suppress=True, threshold=MM.inf())
 
 def testMultiLayerNN():
     data = readData1()
-    data.X = DUtils.preprocessData(data.X,True,3)
+    data.X = DUtils.preprocessData(data.X,True,2)
     MV.plotData(data.X,data.Y,"All Datas")
     (xn,xm) = data.X.shape
     wb_mats =[]
@@ -115,7 +120,7 @@ def testMultiLayerNN():
     #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
     #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
     #wb_mats.append(MM.array([[1.0],[1.0],[1.0]])*initV)
-    layerSizeList = [xm,3,2,1]
+    layerSizeList = [xm,2,1]
     for l in range(len(layerSizeList)-1):
         wb_mats.append(MM.ones([layerSizeList[l]+1,layerSizeList[l+1]])*initV)
     wb = NeuralLeaf(wb_mats)    
@@ -125,6 +130,7 @@ def testMultiLayerNN():
     model1.trainOption.trainRatio = 1.0
     model1.trainOption.validationRatio = 0.0
     model1.trainOption.testRatio = 0.0
+    model1.trainOption.regularLamada = 0.0
     model1.setData(data)
     monitorOpiton=TMot.MonitorOption()
     monitorOpiton.enable = True
@@ -146,15 +152,50 @@ def testMultiLayerNN():
     finalTestCost = model1.calCost(newWb,model1.testData)
     Log.Debug(LeafBaseTestTag,f"afterTrain: trainCost={finalTrainCost},validCost={finalValidCost},testCost={finalTestCost}")
     Log.Debug(LeafBaseTestTag,f"monitorData costs=\n{monitorData.costs} \nrates=\n{monitorData.rates},")
+
+
+def testReg():
+    data = readData2()
+    Log.Debug(LeafBaseTestTag,f"originXShape={data.X.shape}")
+    data.X = DUtils.preprocessData(data.X,False,6)
+    Log.Debug(LeafBaseTestTag,f"after process XShape={data.X.shape}")
+    MV.plotData(data.X,data.Y,"All Datas")
+    (xn,xm) = data.X.shape
     
+    wb_mats =[]
+    initV = 0.0
+    #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
+    #wb_mats.append(MM.array([[1.0,1.0],[1.0,1.0],[1.0,1.0]])*initV)
+    #wb_mats.append(MM.array([[1.0],[1.0],[1.0]])*initV)
+    layerSizeList = [xm,1]
+    for l in range(len(layerSizeList)-1):
+        wb_mats.append(MM.ones([layerSizeList[l]+1,layerSizeList[l+1]])*initV)
+    wb = NeuralLeaf(wb_mats)    
+    model1 = BCM(layerSizeList,wb)
+    #wb =model1.wb
+    model1.trainOption.MaxIteration = 100
+    model1.trainOption.trainRatio = 1.0
+    model1.trainOption.validationRatio = 0.0
+    model1.trainOption.testRatio = 0.0
+    model1.trainOption.regularLamada = 0.0
+    model1.setData(data)
+    monitorOpiton=TMot.MonitorOption()
+    monitorOpiton.enable = True
+    monitorData=TMot.MonitorData()
+    [cost,grads] = model1.calCostAndGrads(wb,data)
+    #Log.Debug(LeafBaseTestTag,f"costs={cost},grads={grads[0][:,0:3]}")
+    #model1.train(monitorOpiton,monitorData)
+    #MM.set_printoptions()
+    Log.Debug(LeafBaseTestTag,f"aftercosts={cost},grads={grads}")
+
 def main():
     Log.Debug(LeafBaseTestTag,"test case run")
 
     #testReadSimpleData()
     #testPredictXBeforeTrain()
     #testCalCostAndGrad()
-    testMultiLayerNN()
-
+    #testMultiLayerNN()
+    testReg()
     #data visual flow-> 
     # before train: dataXY --> 
     # train: train Costs/Iteration.(how many iterations, early stop?) -->
