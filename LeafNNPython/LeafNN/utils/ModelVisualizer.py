@@ -1,13 +1,13 @@
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
-#import numpy as np
 import matplotlib.pyplot as plt
 from LeafNN.core.LeafModels.NeuralLeaf import NeuralLeaf
+from LeafNN.utils.Log import Log
 #np.array = MM.original_np_array
 class ModelVisualizer:
     """
     only for two layers network
     """
-    def plot2DDecisionBoundary(wb:NeuralLeaf,X,Y,Single=True):
+    def plot2DDecisionBoundary(wb:NeuralLeaf,X,Y,meshX=None,meshY=None, boundaryValues=None,Single=False):
         # boundary h(z(x,cita)) > 0.5 ->1.0 h(z(x,cita))<0.5 -->0.0
         # z(x,cita) >0 -->1.0 z(x,cita)<0 -->0.0 z(x,cita) = 0 -->boundary
         # first get dataX(x0->max,->min) z(x1,x2) = 0 ->x2min,x2max
@@ -16,7 +16,7 @@ class ModelVisualizer:
         inds0 = 0
         # second dimension
         inds1 = 1
-            
+        [m,n]=X.shape    
         x_y0 = X[Y.flatten() == 0]
         x_y1 = X[Y.flatten() == 1]
 
@@ -33,12 +33,17 @@ class ModelVisualizer:
                 x0_min = xi[inds0]
         # wx+b = 0 b*1.0 + w1*x1+w2*x2 =0 
         # todo not consider w1*x1 + w2*x2 + w3*x3 ...=0 such situation
-        x1_max = (x0_max*wb[0][1][0] + +wb[0][0][0])/(-1.0*(wb[0][2][0]+MM.finfo().eps))
-        x1_min = (x0_min*wb[0][1][0] + +wb[0][0][0])/(-1.0*(wb[0][2][0]+MM.finfo().eps))
-        x0min_max =[x0_min,x0_max]
-        x1min_max =[x1_min,x1_max] 
-        plt.plot(x0min_max,x1min_max,linestyle="-")
-        
+        if(n<=2):
+            if(n<2):
+                Log.Error("ModelVisualize",f"X only have{n} features, not enough to support decision boundary yet")
+                return
+            x1_max = (x0_max*wb[0][1][0] + +wb[0][0][0])/(-1.0*(wb[0][2][0]+MM.finfo().eps))
+            x1_min = (x0_min*wb[0][1][0] + +wb[0][0][0])/(-1.0*(wb[0][2][0]+MM.finfo().eps))
+            x0min_max =[x0_min,x0_max]
+            x1min_max =[x1_min,x1_max] 
+            plt.plot(x0min_max,x1min_max,linestyle="-")
+        else:
+            plt.contour(meshX[:,inds0], meshX[:,inds1], meshY, levels=boundaryValues, colors='blue', linewidths=2)
         if Single:
             # Add labels and title
             plt.xlabel('X1')
@@ -49,10 +54,6 @@ class ModelVisualizer:
             plt.legend()
             # Display the plot
             plt.show()
-
-    def plot2DDecisionBoundaryWithTestCase(wb:NeuralLeaf,X,Y,X_t,Y_t,Y_pt):
-        ModelVisualizer.plot2DDecisionBoundary(wb,X,Y,False)
-        ModelVisualizer.plotDataWithTestCase(X,Y,X_t,Y_t,Y_pt)
 
     def plotData(X,Y,titleAdd=None):
         # Separate the data based on the values of y
@@ -101,7 +102,7 @@ class ModelVisualizer:
         # Add labels and title
         plt.xlabel('X1')
         plt.ylabel('X2')
-        plt.title(f'TestCase TrainNums={len(X)}\ntrainTest:nums={i},passed={i-noPass}')
+        plt.title(f'TestCase TrainNums={len(X)}\ntrainTest:nums={i},passeRate={(i-noPass)/i}')
 
         # Add a legend
         plt.legend()
