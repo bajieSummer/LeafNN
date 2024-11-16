@@ -116,6 +116,9 @@ class MathMatrix:
     def isClose(a,b):
         return np.isclose(a,b)
     
+    def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None,
+             axis=0, *, device=None):
+        return np.linspace(start=start,stop=stop,num=num,endpoint=endpoint,retstep=retstep,dtype=dtype,axis=axis,device=device)
 
     def set_printoptions(precision,suppress,threshold):
         np.set_printoptions(precision=precision, suppress=suppress, threshold=threshold)
