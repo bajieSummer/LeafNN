@@ -1,5 +1,4 @@
 from LeafNN.utils.Log import Log
-import numpy as np
 import LeafNN.core.LeafModels.ModelData as MD
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
 DataUtilsTag = "DataUtilsTag"
@@ -16,7 +15,7 @@ class DataUtils:
                 data.append([float(element) for element in elements])
                 lineCount += 1
         # transform into np.array
-        result = np.array(data)
+        result = MM.array(data)
         [n,m] = result.shape
         dataX = result[:,0:m-1]
         dataY = result[:,m-1:m]
@@ -38,7 +37,7 @@ class DataUtils:
         res = x
         length = max - min
         if(length == 0.0):
-            if np.isclose(min,0.0):
+            if MM.isclose(min,0.0):
                 res = 0.0
             else:
                 res = 1.0
@@ -77,8 +76,36 @@ class DataUtils:
         return res
 
 
+    def generateMeshPoints(X_origin,HighestPolyDegree,meshId0,meshId1,wb,predictFunc,isNormalLize=False,cross=True):
+        """
+        X_origin: X,HighestPolyDegree, the highest PolyDegree
+        meshId0,meshId1, indexes of X_origin,  x_axis : X_origin[meshId0], y_axis:X_origin[meshId1]
+        isNormalize: should X features scale to 0~1
+        cross : X1*X1, X1*X2  ,X2*X2,  X1*X2 is the cross feature
+        """
+        [X_mins,X_maxs]=DataUtils.findFeatureMaxMin(X_origin)
+        [m,n] = X_origin.shape
+        Xres = None
+        m2 =50
+        for i in range(n):
+            xfi = MM.linspace(X_mins[i], X_maxs[i], m2)[:,MM.newaxis]  # Range for x
+            if Xres is None:
+                Xres = xfi
+            else:
+                Xres = MM.hstack([Xres,xfi])
+        # we create mesh based meshId0,meshId1 
+        mY = MM.ones([m2,m2])
+        for i in range(m2):
+            xfid0i =Xres[:,meshId0][i]
+            X_id0i = MM.ones([m2,1])*xfid0i
+            mX = Xres*1.0
+            mX[:,meshId0] = X_id0i.flatten()
+            mX = DataUtils.preprocessData(mX,isNormalLize,HighestPolyDegree,cross)  
+            mY[i,:] = predictFunc(mX,wb).flatten()
 
-
+        return [Xres,mY]
+        
+            
     # tod first normalize then multiPolyDegree?
     def preprocessData(X_input,isNormalize,HighestPolyDegree,cross=True):
         """
