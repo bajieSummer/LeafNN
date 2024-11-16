@@ -98,7 +98,9 @@ def testTrain():
     testX = data.X[startInds:endInds]
     testY = data.Y[startInds:endInds]
     Y_p=model1.predict(testX,model1.wb)
-    MV.plot2DDecisionBoundaryWithTestCase(newWb,data.X,data.Y,testX,testY,Y_p)
+    #MV.plot2DDecisionBoundaryWithTestCase(newWb,data.X,data.Y,testX,testY,Y_p)
+    MV.plot2DDecisionBoundary(newWb,data.X,data.Y)
+    MV.plotDataWithTestCase(data.X,data.Y,testX,testY,Y_p)
     # more debug info
     Log.Debug(LeafBaseTestTag,f"afterTrain: newWb=\n {newWb}")
     finalTrainCost = model1.calCost(newWb,model1.trainData)
@@ -156,8 +158,11 @@ def testMultiLayerNN():
 
 def testReg():
     data = readData2()
+    X_o = data.X*1.0
+    Hdeg = 6
+    isNorm = False
     Log.Debug(LeafBaseTestTag,f"originXShape={data.X.shape}")
-    data.X = DUtils.preprocessData(data.X,False,6)
+    data.X = DUtils.preprocessData(data.X,isNorm,Hdeg)
     Log.Debug(LeafBaseTestTag,f"after process XShape={data.X.shape}")
     MV.plotData(data.X,data.Y,"All Datas")
     (xn,xm) = data.X.shape
@@ -177,29 +182,62 @@ def testReg():
     model1.trainOption.trainRatio = 1.0
     model1.trainOption.validationRatio = 0.0
     model1.trainOption.testRatio = 0.0
-    model1.trainOption.regularLamada = 0.0
+    model1.trainOption.regularLamada = 1.0
     model1.setData(data)
     monitorOpiton=TMot.MonitorOption()
     monitorOpiton.enable = True
     monitorData=TMot.MonitorData()
     [cost,grads] = model1.calCostAndGrads(wb,data)
     #Log.Debug(LeafBaseTestTag,f"costs={cost},grads={grads[0][:,0:3]}")
-    #model1.train(monitorOpiton,monitorData)
+    model1.train(monitorOpiton,monitorData)
+    newWb = model1.wb
+    MV.plotCostWithWB(monitorData.iterationInds,monitorData.costs,wb,newWb)
+    startInds = 0
+    endInds = xn
+    testX = data.X[startInds:endInds]
+    testY = data.Y[startInds:endInds]
+    Y_p=model1.predict(testX,model1.wb)
+    #MV.plot2DDecisionBoundaryWithTestCase(newWb,data.X,data.Y,testX,testY,Y_p)
+    [meshX,meshY] = DUtils.generateMeshPoints(X_o,Hdeg,0,1,newWb,model1.predict,isNorm,True)
+    MV.plot2DDecisionBoundary(newWb,data.X,data.Y,meshX,meshY,[0.3,0.5,0.7])
+    MV.plotDataWithTestCase(data.X,data.Y,testX,testY,Y_p)
+
     #MM.set_printoptions()
     Log.Debug(LeafBaseTestTag,f"aftercosts={cost},grads={grads}")
-
+# import numpy as np
+# import matplotlib.pyplot as plt
+# def testMeshPoints():
+#     a1 = np.linspace(-1,1,20)
+#     a2 = np.linspace(-10,10,20)
+#     p1 = np.ones([20,2])*10
+#     p1[:,0]=a1
+#     p1[:,1]=a2
+#     print(a1.shape)
+#     print(a2.shape)
+#     [X,Y] = np.meshgrid(a1,a2)
+#     print(X)
+#     print(Y)
+#     Z = X*X + Y*Y -1
+#     plt.figure()
+#     plt.contour(p1[:,0], p1[:,1], Z, levels=[0], colors='blue', linewidths=2)
+#     plt.show()
+#     t1 = MM.ones([3,2])*2
+#     tf = MM.ones([3,1])*3
+#     t2 = t1*1.0
+#     t2[0][0] = 10
+#     t2[:,1] = tf.flatten()
+#     print(t1)
+#     print(t2)
+    
+#testMeshPoints()
 def main():
     Log.Debug(LeafBaseTestTag,"test case run")
 
     #testReadSimpleData()
     #testPredictXBeforeTrain()
     #testCalCostAndGrad()
+    #testTrain()
     #testMultiLayerNN()
-    testReg()
-    #data visual flow-> 
-    # before train: dataXY --> 
-    # train: train Costs/Iteration.(how many iterations, early stop?) -->
-    #  after train: train_dataXY_Y_p, decisionBoundary,(train:pass rate.)-->
-    
+    testReg() 
 
 main()
