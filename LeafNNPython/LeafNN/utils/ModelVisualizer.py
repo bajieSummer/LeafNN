@@ -133,4 +133,18 @@ class ModelVisualizer:
     def plotCost(inds,costs):
         ModelVisualizer.plotCostWithWB(inds,costs)
 
+    def plotYYpre(inds,Y,Y_pre,title):
+        Y_inds = Y[inds,:]
+        Y_inds_pre = Y_pre[inds,:]
+
+        # Plot the points with different shapes or colors based on the value of y
+        plt.scatter(inds, Y_inds, color='green', marker='s', label='from data')  # Squares for y=0
+        plt.scatter(inds, Y_inds_pre, color='orange', marker='s', label='from predict')   # Tria
+        plt.title(title)
+        plt.xlabel('indices')
+        plt.ylabel('Y')
+        # Add a legend
+        plt.legend()
+        # Display the plot
+        plt.show()
    
