@@ -1,25 +1,19 @@
 from LeafNN.utils.Log import Log
 import LeafNN.core.LeafModels.ModelData as MD
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
+from LeafNN.core.LeafModels.Leaf import Leaf
+from LeafNN.ModelDataConverters.ConvertorFactory import ConvertorFactory
 DataUtilsTag = "DataUtilsTag"
 class DataUtils:
     def __init__(self):
         Log.Debug(DataUtilsTag,"DataUtils init")
     
+    def Leaf2ClassifyData(leaf:Leaf):
+        return MD.ClassifyData(leaf[0],leaf[1])
+    
     def readDataXYFromFile(filePath)->MD.ClassifyData:
-        with open(filePath, 'r') as file:
-            lineCount = 0
-            data = []
-            for line in file:
-                elements = line.strip().split(',')  # Split the line by comma
-                data.append([float(element) for element in elements])
-                lineCount += 1
-        # transform into np.array
-        result = MM.array(data)
-        [n,m] = result.shape
-        dataX = result[:,0:m-1]
-        dataY = result[:,m-1:m]
-        return MD.ClassifyData(dataX,dataY)
+        leaf = ConvertorFactory.getInstance().readXYFromFile(filePath)
+        return DataUtils.Leaf2ClassifyData(leaf)
     
     def findFeatureMaxMin(X):
         (m,n) = X.shape
