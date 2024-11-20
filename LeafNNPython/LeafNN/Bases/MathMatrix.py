@@ -120,7 +120,7 @@ class MathMatrix:
              axis=0, *, device=None):
         return np.linspace(start=start,stop=stop,num=num,endpoint=endpoint,retstep=retstep,dtype=dtype,axis=axis,device=device)
 
-    def set_printoptions(precision,suppress,threshold):
+    def set_printoptions(precision,suppress,threshold=None):
         np.set_printoptions(precision=precision, suppress=suppress, threshold=threshold)
 
         
