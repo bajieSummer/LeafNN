@@ -138,8 +138,8 @@ class ModelVisualizer:
         Y_inds_pre = Y_pre[inds,:]
 
         # Plot the points with different shapes or colors based on the value of y
-        plt.scatter(inds, Y_inds, color='green', marker='s', label='from data')  # Squares for y=0
-        plt.scatter(inds, Y_inds_pre, color='orange', marker='s', label='from predict')   # Tria
+        plt.scatter(inds, Y_inds, color='green', marker='^', label='from data')  # Squares for y=0
+        plt.scatter(inds, Y_inds_pre, color='orange', marker='v', label='from predict')   # Tria
         plt.title(title)
         plt.xlabel('indices')
         plt.ylabel('Y')
