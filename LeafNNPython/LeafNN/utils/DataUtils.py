@@ -15,6 +15,12 @@ class DataUtils:
         leaf = ConvertorFactory.getInstance().readXYFromFile(filePath)
         return DataUtils.Leaf2ClassifyData(leaf)
     
+    def readWB(filePath):
+        return ConvertorFactory.getInstance().readWB(filePath)
+    
+    def writeWB(leaf,filePath):
+        return ConvertorFactory.getInstance().writeWB(leaf,filePath)
+    
     def findFeatureMaxMin(X):
         (m,n) = X.shape
         featureMaxs = [-1.0*MM.inf()]*n

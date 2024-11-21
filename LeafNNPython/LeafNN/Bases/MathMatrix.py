@@ -116,6 +116,12 @@ class MathMatrix:
     def isClose(a,b):
         return np.isclose(a,b)
     
+    def arange(range):
+        return np.arange(range)
+    
+    def randIndices(arraySize,chooseSize):
+        return np.random.choice(arraySize, size=chooseSize, replace=False)
+
     def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None,
              axis=0, *, device=None):
         return np.linspace(start=start,stop=stop,num=num,endpoint=endpoint,retstep=retstep,dtype=dtype,axis=axis,device=device)
