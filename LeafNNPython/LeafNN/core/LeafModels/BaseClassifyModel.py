@@ -67,7 +67,7 @@ class BaseClassifyModel:
         l = 0
         while(l < layerSize - 1):
             # self.layerNodeSizeList[l]+1, +1 for bias
-            WBmats[l] = MM.rand(self.layerNodeSizeList[l]+1,self.layerNodeSizeList[l+1])
+            WBmats[l] = MM.rand(self.layerNodeSizeList[l]+1,self.layerNodeSizeList[l+1])*2.0-1.0
             l+=1
         return NeuralLeaf(WBmats)
 
