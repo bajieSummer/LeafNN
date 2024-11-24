@@ -1,6 +1,6 @@
 # config.py
 import numpy as np
-
+#import matrix_multiply
 class MathMatrix:
     newaxis = np.newaxis
     default_Type = np.float64
@@ -29,6 +29,9 @@ class MathMatrix:
         #return np.sqrt(arr).astype(MathMatrix.default_Type)
         return np.sqrt(arr)
     
+    def square(a):
+        return np.square(a)
+    
     def log(arr):
         """Compute the natural logarithm and return as float128 if necessary."""
         # Check if the input is already float128
@@ -56,15 +59,21 @@ class MathMatrix:
         #return MathMatrix.matmulS(a,b)
     
     def matmulS(a,b):
-        (m,n) = a.shape
-        (n1,mt) = b.shape
-        res = MathMatrix.zeros([m,mt])
-        for i in range(m):
-            for j in range(mt):
-                res[i][j] = 0
-                for t in range(n):
-                    res[i][j]+= a[i][t]*b[t][j]
-        return res
+        #result = matrix_multiply.multiply(a.tolist(),b.tolist())
+        #return np.array(result)
+        # a1 = np.ones([3,2])*2.0
+        # a2 = np.ones([2,4])*1.0
+        # res = matrix_multiply.multiply(a1.tolist(),a2.tolist())
+        return np.matmul(a,b)
+        # (m,n) = a.shape
+        # (n1,mt) = b.shape
+        # res = MathMatrix.zeros([m,mt])
+        # for i in range(m):
+        #     for j in range(mt):
+        #         res[i][j] = 0
+        #         for t in range(n):
+        #             res[i][j]+= a[i][t]*b[t][j]
+        # return res
 
     def abs(arr):
         """Compute the absolute value and return as float128."""
@@ -83,7 +92,8 @@ class MathMatrix:
         """Transpose an array and return it."""
         return np.transpose(arr, axes=axes)
     
-    
+    def argmax(array,aixs):
+        return np.argmax(array, axis=aixs)
 
     def finfo(dtype=None):
         """Return floating-point information for the specified dtype."""
@@ -125,6 +135,9 @@ class MathMatrix:
     def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None,
              axis=0, *, device=None):
         return np.linspace(start=start,stop=stop,num=num,endpoint=endpoint,retstep=retstep,dtype=dtype,axis=axis,device=device)
+
+    def is_numpy_array(variable):
+        return isinstance(variable, np.ndarray)
 
     def set_printoptions(precision,suppress,threshold=None):
         np.set_printoptions(precision=precision, suppress=suppress, threshold=threshold)
