@@ -99,6 +99,7 @@ class Leaf:
         result = 0
         success = True
         # if other like this? Leaf([np.array([[1.0]]]))
+        isSame = self is other
         if MM.isNum(other): 
             return self.__multiplyScalar(other)
         elif isinstance(other,Leaf):
@@ -108,8 +109,11 @@ class Leaf:
             i = 0
             for mat in self._matrixs:
                 # todo why would it save time?
-                #result += MM.sum(mat*other[i])
-                result +=MM.sum( MM.matmulS(MM.transpose(mat),other[i]) )
+                if isSame:
+                    result += MM.sum(MM.square(mat))
+                else:
+                    result += MM.sum(mat*other[i])
+                #result +=MM.sum( MM.matmulS(MM.transpose(mat),other[i]) )
                 #result += np.sum(np.dot(np.transpose(mat),other[i]))
                 i=i+1
         else:
