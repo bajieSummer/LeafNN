@@ -148,3 +148,16 @@ class ModelVisualizer:
         # Display the plot
         plt.show()
    
+    def plotGradientsSquare(inds,gradients,title):
+        plt.title(title)
+        gradSqaure = []
+        for gd in gradients:
+            gradSqaure.append(gd*gd)
+        plt.scatter(inds,gradSqaure,color='orange',marker='s',label ='GradientsStrength')
+        Log.Debug("gradientsStrength>>>",gradSqaure)
+        plt.xlabel('iteration')
+        plt.ylabel('gradientsSquare')
+        # Add a legend
+        plt.legend()
+        # Display the plot
+        plt.show()
