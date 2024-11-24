@@ -10,57 +10,10 @@ from LeafNN.core.LeafModels.NeuralLeaf import NeuralLeaf
 import LeafNN.core.LeafModels.TrainMonitor as TMot
 from LeafNN.utils.ModelVisualizer import ModelVisualizer as MV
 import LeafNN.core.LeafModels.ModelData as MD
-import re
-from PIL import Image
-from pathlib import Path
+from LeafNN.utils.ImageUtils import ImageUtils
+
 
 HandWriteClassifyTestTag = "HandWriteClassify_Test"
-
-def createImgMatsFromData(X,ShowWidth=1024,isTranspose=False,pic_width=None):
-    [m,n] = X.shape
-    if pic_width is None:
-        pic_width = int(MM.sqrt(n))
-    pic_height = int(n/pic_width)
-    Log.Debug(HandWriteClassifyTestTag,f"X shape is{m} {n}, Width={pic_width},height={pic_height}")
-    imgXs =[]
-    #imgXs.append(X[0].reshape(pic_width,pic_height))
-    columns = int(ShowWidth/pic_width)
-    blanks = MM.ones([pic_width,pic_height])
-    i = 0
-    while i < m:
-        imgXi = None
-        j = 0
-        while j < columns:
-            if i >=m:
-                imgXi = MM.hstack([imgXi,blanks])
-            else:
-                T = X[i].reshape(pic_width,pic_height)
-                if isTranspose:
-                    T =  MM.transpose(T)
-                if imgXi is None:
-                    imgXi = T
-                else:
-                    imgXi = MM.hstack([imgXi,T])
-            j+=1
-            i+=1
-        imgXs.append(imgXi)
-    imgsMat = None
-    for img in imgXs:
-        if imgsMat is None:
-            imgsMat = img
-        else:
-            imgsMat=MM.vstack([imgsMat,img])
-    return imgsMat
-    
-    
-def displayImgsFromX(X,ShowWidth=1024,isTranspose=False,imgWidth=None):
-    imgMats = createImgMatsFromData(X,ShowWidth,isTranspose,imgWidth)
-    img = Image.fromarray(imgMats*255)
-    osize = img.size
-    scaled_image = img.resize((osize[0]*2,osize[1]*2), Image.LANCZOS) 
-    scaled_image.show()
-    return scaled_image
-
 
 def readMatData1(file_name,transpose=False,picW=None):
     #file_name = "ex3data1.mat"
@@ -81,7 +34,7 @@ def Case1showData():
     X = data.X
     Y = data.Y
     Log.Debug(HandWriteClassifyTestTag,f"X shape={X.shape}, Y shape={Y.shape}")
-    displayImgsFromX(X[0:1200,:])
+    ImageUtils.displayImgsFromX(X[0:1200,:],1024,2)
     Log.Debug(HandWriteClassifyTestTag,f"Y=\n{Y[0:1200,:]}")
 
 
@@ -93,7 +46,7 @@ def train2LayerXY(Xt,Yt,layerSizeList,wb,maxIteration):
     model1.trainOption.trainRatio = 1.0
     model1.trainOption.validationRatio = 0.0
     model1.trainOption.testRatio = 0.0
-    model1.trainOption.regularLamada = 1.0
+    model1.trainOption.regularLamada = 0.1
     model1.setData(data)
     monitorOpiton=TMot.MonitorOption()
     monitorOpiton.enable = True
@@ -181,7 +134,7 @@ def case2TrainOneVsAll():
     [YRes,Yprob] = predictOneVsAll(data.X,wbs,numLabels)
     [rate,NonPassInds]=getPassRate(data.Y,YRes)
     Log.Debug(HandWriteClassifyTestTag,f"passRate={rate}")
-    displayImgsFromX(data.X[NonPassInds,:],15*20)
+    ImageUtils.displayImgsFromX(data.X[NonPassInds,:],15*20,2)
     MV.plotYYpre(NonPassInds,data.Y,YRes,f"notPass Y and its prediction not_pass={len(NonPassInds)},total={len(YRes)}")
 
 def case3TestHandWritingsWithTrainedWB():
@@ -201,51 +154,16 @@ def case3TestHandWritingsWithTrainedWB():
     xindices = MM.randIndices(len(tX),100)
     [YRes,Yprob] = predictOneVsAll(tX[xindices,:],wbs,numLabels)
     Y_indices = MM.arange(YRes.shape[0])
-    displayImgsFromX(tX[xindices,:],400)
+    ImageUtils.displayImgsFromX(tX[xindices,:],400,2)
     MV.plotYYpre(Y_indices,tY[xindices,:],YRes,f"predict")
 
-def createTestXYFromBaseNumberPics(folderPath,isTranspose = False,isResize=False,picW=None,picH=None):
-    directory = Path(folderPath)
-    file_paths = list(directory.rglob('*.jpg'))
-    testX = None
-    testY = None
-    for fpath in file_paths:
-        image = Image.open(fpath)
-        if image is None:
-            continue
-        # if(isResize and picW and picH):
-        #     image = image.resize((picW,picH))
-        image = image.convert('L')
-        filename = os.path.basename(fpath)
-        numbers = re.findall(r'\d+', filename)
-        number = None
-        if numbers:
-            number = float(numbers[0])
-        else:
-            continue
-        image_array = MM.array(image)
-        if isTranspose:
-            image_array = MM.transpose(MM.array(image))
-        Log.Debug(HandWriteClassifyTestTag,f"img=\n{image_array}")
-        image_array = image_array.flatten().reshape(1, -1)
-        # to do why
-      
-        if(testX is None):
-            testX = image_array
-        else:
-            testX = MM.vstack([testX,image_array])
-        curY = MM.ones([1,1])*number
-        if(testY is None):
-            testY = curY
-        else:
-            testY = MM.vstack([testY,curY])
-    return MD.ClassifyData(testX/255.0,testY)
+
       
 def case4TestPredictNumbersFromPics():
     #createTestXYFromPics(folderPath)
     folder_name = "testPics1"
-    testdataFolderPath = os.path.join(PathUtils.getDemoDatasPath(),folder_name)
-    testXY = createTestXYFromBaseNumberPics(testdataFolderPath,False,True,20,20)
+    testPicsFolderPath = os.path.join(PathUtils.getDemoDatasPath(),folder_name)
+    testXY = ImageUtils.createXYDataFromNumberPics(testPicsFolderPath,False,True,20,20)
     numLabels = 10
     wbs=[]
     for i in range(numLabels):
@@ -255,7 +173,7 @@ def case4TestPredictNumbersFromPics():
     [YRes,Yprob] = predictOneVsAll(testXY.X,wbs,numLabels)
     size_y = len(YRes)
     xindices = MM.arange(size_y)
-    displayImgsFromX(testXY.X,400)
+    ImageUtils.displayImgsFromX(testXY.X,400,2)
     MV.plotYYpre(xindices,testXY.Y,YRes,f"numberPicsPredict,size={size_y}")
     Log.Debug(HandWriteClassifyTestTag,f"y-y_pre-probilitys\n{MM.hstack([testXY.Y,YRes,Yprob])}")
 
@@ -314,24 +232,6 @@ def case5TrainAll2All():
     passRate = passedNums/m
     Log.Debug(HandWriteClassifyTestTag,f"samples={m},passRate={passRate}")
     #  
-import numpy as np
-def saveImgs(folderPath,X,Y,picW,picH):
-    [m,n] = X.shape
-    # os.path.join(PathUtils.getDemoDatasPath()
-    if(picW*picH)!=n:
-        Log.Error(HandWriteClassifyTestTag,"wrong picw,and pich")
-        return
-    for i in range(m):
-        ix = X[i,:].reshape([picW,picH])*255.0
-        #ix = ix.astype(np.uint8)
-        img = Image.fromarray(ix)
-        
-        filePath = os.path.join(folderPath,f"Y{Y[i,0]}_x{i}.jpg")
-        #img.save(filePath)
-        #img.show()
-        img_converted = img.convert('L') 
-        #img_converted.show()
-        img_converted.save(filePath)
 
 def case6predictTrainDataWithWB_all2all():
     origData = readMatData1("ex3data1.mat",True)
@@ -365,9 +265,9 @@ def case6predictTrainDataWithWB_all2all():
     for i in range(m):
         if(YRes_process[i]==Y[i]):
             passedNums+=1
-    displayImgsFromX(X,400)
+    ImageUtils.displayImgsFromX(X,400,2)
     folderPath = os.path.join(PathUtils.getDemoDatasPath(),"savePics")
-    saveImgs(folderPath,X,Y,20,20)
+    ImageUtils.saveNumberImgsFromXYData(folderPath,X,Y,20,20)
     passRate = passedNums/m
     Log.Debug(HandWriteClassifyTestTag,f"samples={m},passRate={passRate}")
 
@@ -380,7 +280,7 @@ def case7predictMyHandWritesWithWB_all2all():
     outSide =False
     
     testdataFolderPath = os.path.join(PathUtils.getDemoDatasPath(),folder_name)
-    originTestXY = createTestXYFromBaseNumberPics(testdataFolderPath,outSide,False,20,20)
+    originTestXY = ImageUtils.createXYDataFromNumberPics(testdataFolderPath,outSide,False,20,20)
     X = originTestXY.X
     oY = originTestXY.Y
     numLabels = 10
@@ -406,7 +306,7 @@ def case7predictMyHandWritesWithWB_all2all():
             passedNums+=1
     passRate = passedNums/m
     Log.Debug(HandWriteClassifyTestTag,f"samples={m},passRate={passRate}")
-    displayImgsFromX(X,400)
+    ImageUtils.displayImgsFromX(X,400,2)
     indices = MM.arange(m)
     MV.plotYYpre(indices,originTestXY.Y,YRes_process,"img-numbers identify")
     Log.Debug(HandWriteClassifyTestTag,f"YResProcess-Y{MM.hstack([YRes_process,oY])}")
