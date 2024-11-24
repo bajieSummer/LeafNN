@@ -1,5 +1,6 @@
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
 from LeafNN.core.LeafModels.Leaf import Leaf
+from LeafNN.core.LeafModels.NeuralLeaf import NeuralLeaf
 from LeafNN.ModelDataConverters.BaseDataReader import BaseDataReader
 from LeafNN.utils.Log import Log
 import scipy.io
@@ -44,5 +45,10 @@ class MatFile2Leaf(BaseDataReader):
         return Leaf(matArr)
     
     def readWBFromFile(self, filePath):
-        Log.Error(TagMatFile2Leaf,"Error: Not implemented")
-        return None
+        #Log.Error(TagMatFile2Leaf,"Error: Not implemented")
+        data = self.read_mat_file(filePath)
+        matArr= []
+        for key in data:
+            matArr.append(data[key])
+        return NeuralLeaf(matArr)
+        #return None

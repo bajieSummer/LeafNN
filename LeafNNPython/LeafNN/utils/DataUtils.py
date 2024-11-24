@@ -11,12 +11,29 @@ class DataUtils:
     def Leaf2ClassifyData(leaf:Leaf):
         return MD.ClassifyData(leaf[0],leaf[1])
     
-    def readDataXYFromFile(filePath)->MD.ClassifyData:
+    def readDataXYFromFile(filePath,isTransposeX=False,picW = None)->MD.ClassifyData:
         leaf = ConvertorFactory.getInstance().readXYFromFile(filePath)
-        return DataUtils.Leaf2ClassifyData(leaf)
-    
-    def readWB(filePath):
-        return ConvertorFactory.getInstance().readWB(filePath)
+        data = DataUtils.Leaf2ClassifyData(leaf)
+        if isTransposeX:
+            [m,n] = data.X.shape
+            pw = picW
+            resX = MM.zeros(data.X.shape)
+            if pw is None:
+                pw = int(MM.sqrt(n))
+            ph = int(n/pw)
+                # todo pw*ph!=n warning or error
+            for i in range(m):
+                rxi = data.X[i,:].reshape([pw,ph])
+                resX[i,:] = MM.transpose(rxi).flatten()
+            data.X = resX
+        return data
+
+    def readWB(filePath,isTranspose=False):
+        wb = ConvertorFactory.getInstance().readWB(filePath)
+        if isTranspose:
+            return wb.T()
+        else:
+            return wb
     
     def writeWB(leaf,filePath):
         return ConvertorFactory.getInstance().writeWB(leaf,filePath)
