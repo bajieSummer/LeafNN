@@ -156,7 +156,8 @@ class OptimalFuncFactory:
                 X,f0,df0 = Xb,fb,dfb
                 Log.Debug("testTrain","failed") 
                 if ls_failed:
-                    Log.Warning(OptimalTag,"fminWithPolar>>Failed twice")    
+                    Log.Warning(OptimalTag,"fminWithPolar>>Failed twice") 
+                    # todo   
                     break
                 #GDF.swap(df0,df1)
                 #df0,df1 =df1,df0
