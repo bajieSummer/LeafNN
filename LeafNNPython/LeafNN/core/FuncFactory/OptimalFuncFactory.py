@@ -143,14 +143,14 @@ class OptimalFuncFactory:
                 df1 = tmp
                 #d1 =  GDF.dot(df0,s1)
                 d1 = df0*s1
-                Log.Debug("testTrain",f"here6 i={i} j={j},newf={f0}, success_s/s1 ={s1},d2/d1={d1},df1/df0={df0},df2/df1={df1},z1/a0={a0}")
+                #Log.Debug("testTrain",f"here6 i={i} j={j},newf={f0}, success_s/s1 ={s1},d2/d1={d1},df1/df0={df0},df2/df1={df1},z1/a0={a0}")
                 if(d1>0):
                     s1 = -1.0*df0
                     #d1 = -1.0*GDF.dot(s1,s1)
                     d1 = -1.0*(s1*s1)
                 a0 = a0 *min(RATIO,d0/(d1-MM.finfo(float).eps))  # it will faster its converge
                 d0 = d1
-                Log.Debug("testTrain",f"here7 after:i={i} j={j} z1/a0={a0},d1/d0={d0},z2/a1={a1},z3/a2={a2}")
+                Log.Debug("testTrain",f"here7 after:i={i} j={j} cost={f1},d1/d0={d0},z1/a0={a0}")
                 ls_failed = 0   
             else:
                 X,f0,df0 = Xb,fb,dfb
