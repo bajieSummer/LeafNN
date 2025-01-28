@@ -71,7 +71,7 @@ def trainOneVsAll(X,Y,numLabels,maxIteration):
         [wbk,mdata] = train2LayerXY(X,Yk,layerSizeList,wb_init,maxIteration)
         wbs.append(wbk)
         Log.Debug(HandWriteClassifyTestTag,f"k={k} wb=\n{wbs[k]}")
-        MV.plotCostWithWB(mdata.iterationInds,mdata.costs,wb_init,wbk)
+        #MV.plotCostWithWB(mdata.iterationInds,mdata.costs,wb_init,wbk)
     return wbs
 
 def predictOneVsAll(X,wbs,numLabels):
@@ -106,26 +106,17 @@ def getPassRate(Y,YRes):
         else:
             NonpassInds.append(i)
     return [numPass/m,NonpassInds]
-
-def processDataY(data):
-    resData=MD.ClassifyData(data.X,data.Y)
-    (m,n) = resData.Y.shape
-    for i in range(m):
-        for j in range(n):
-            if (resData.Y[i][j]==10):
-                resData.Y[i][j] = 0
-    return resData
         
 
 def case2TrainOneVsAll():
     data=readMatData1("ex3data1.mat",True)
-    data = processDataY(data)
+    data.Y[data.Y==10] = 0
     # start =0
     # end = 2
     # data.X = data.X[start:end,:]
     # data.Y = data.Y[start:end,:]
     numLabels = 10
-    maxIteraion = 100
+    maxIteraion = 60
     wbs = trainOneVsAll(data.X,data.Y,numLabels,maxIteraion)
     i = 0
     for wb in wbs:
@@ -187,7 +178,7 @@ def case4TestPredictNumbersFromPics():
 #     return Xres
 
 def case5TrainAll2All():
-    origData = readMatData1("ex3data1.mat",True)
+    origData = readMatData1("ex4data1.mat",True)
     # processY
     X = origData.X
     oY = origData.Y
@@ -312,15 +303,15 @@ def case7predictMyHandWritesWithWB_all2all():
     Log.Debug(HandWriteClassifyTestTag,f"YResProcess-Y{MM.hstack([YRes_process,oY])}")
 
      
-MM.set_printoptions(20,True)
+#MM.set_printoptions(20,True)
 def main():
     Log.Debug(HandWriteClassifyTestTag,"begin>>>>>>>")
     #Case1showData()
-    #case2TrainOneVsAll()
+    case2TrainOneVsAll()
     #case3TestHandWritingsWithTrainedWB()
     #case4TestPredictNumbersFromPics()
     #case5TrainAll2All()
     #case6predictTrainDataWithWB_all2all()
-    case7predictMyHandWritesWithWB_all2all()
+    #case7predictMyHandWritesWithWB_all2all()
 
 main()
