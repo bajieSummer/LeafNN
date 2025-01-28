@@ -16,7 +16,8 @@ class LossFuncFactory:
         # Epsilon = 1e-16
         # Y_p = np.clip(Y_p, Epsilon, 1.0 - Epsilon) 
         Loss = -1*( Y*MM.log(Y_p)+(1.0-Y)*MM.log(1.0-Y_p))
-        Loss[((Y == 1.0)&(Y_p == 1.0)) |((Y==0.0)&(Y_p==0.0))] = 0.0 
+        # might cause failure sometime, but will lead to faster converging
+        #Loss[((Y == 1.0)&(Y_p == 1.0)) |((Y==0.0)&(Y_p==0.0))] = 0.0 
         return Loss
     
     def DerivBinaryClassify(Y,Y_p):
