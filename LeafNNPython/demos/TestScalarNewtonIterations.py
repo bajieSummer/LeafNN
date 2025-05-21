@@ -165,9 +165,12 @@ def testScalarNewton4Armijo():
 
 from LeafNN.ConvexOptimizer.ScalarLineSearcher import ArmijoWolfeLineSearcher
 def testScalarNewton4ArmijoWolfe():
-    # saddle point function
+    # saddle point1 function
     # y = x^3
     #args=[0,0,0,1]
+    # saddle point2 function
+    # y = x^3+1
+    argsList=[1,0,0,1]
     #y= x^4
     #argsList=[0,0,0,0,1]
     # y = x^4 + 2*x^3 + 1
@@ -176,8 +179,8 @@ def testScalarNewton4ArmijoWolfe():
     #argsList = [2,-2,0,1]
     # y = x^2-5x+6
     #argsList = [6,-5,1]
-    # y = x^2
-    argsList = [0,0,1.0/1e10]
+    # y = x^2 repeat roots
+    # argsList = [0,0,1.0/1e10]
     LS = ArmijoWolfeLineSearcher(calPolyF,calPolyFAndGrad)
     LS.setSigma(0.5,0.4)
     #LS.setSigma(1.0)
