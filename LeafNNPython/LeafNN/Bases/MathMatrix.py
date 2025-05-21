@@ -126,6 +126,9 @@ class MathMatrix:
     def isClose(a,b):
         return np.isclose(a,b)
     
+    def isAllCloseZero(a):
+        return np.isclose(a.any(),0.0)
+    
     def arange(range):
         return np.arange(range)
     
