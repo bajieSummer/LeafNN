@@ -26,24 +26,15 @@ class NewtonIteration:
         # plan2:
         #d =-1.0*fx/math.sqrt(abs(fx))*gradient/gradientSqrt
         # plan3
-        #d =-1.0*fx/(abs(fx))*gradient/gradientSqrt
+        #d =-1.0*fx/(abs(fx))*gradient/math.sqrt(gradientSquare)
+        # plan4
+        #gradientSqrt = math.sqrt(gradientSquare)
+       # d = -1.0*fx*gradient/gradientSqrt
         # 1. the gradient is the normal vector of F=f(x,y)-z =0   (df/dx,df/dy,-1)
         # the tagent plane is _|_  the normal vector
         # 
-        sgradient = MM.vstack([gradient,-1.0])
-        N = len(sgradient)
-        sv = MM.zeros([N-1,1])
-        gN = sgradient[N-1]
-        lastSV = -gradientSquare
-        for i in range(N-1):
-            gi = gradient[i]
-            sv[i]=gi*gN 
-            #lastSV -=gi*gi
-        lastP0= fx 
-        t = -fx/lastSV
-        d = t*sv 
-        #plan4
-        #d = -1.0*fx/abs(fx)*gradient
+        t = -fx/gradientSquare
+        d = t*gradient
         return d
     
     def calRoot(self,initX,*FuncGradArgs,customLineSearcher=None):
