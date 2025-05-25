@@ -15,6 +15,10 @@ class MathMatrix:
     def zeros(shape, **kwargs):
         """Create an array of zeros with dtype float128."""
         return np.zeros(shape, dtype=MathMatrix.default_Type, **kwargs)
+
+    def diag(v, k=0):
+        """Create diag matrix with existed array v."""
+        return np.diag(v,k)
     
     def rand(*args):
         """Generate random numbers and return them as float128."""
