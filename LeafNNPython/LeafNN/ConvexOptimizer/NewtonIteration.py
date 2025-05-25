@@ -1,6 +1,7 @@
 import math
 from LeafNN.utils.Log import Log
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
+from LeafNN.Bases.MatrixLinear import MatrixLinear as ML
 from .LineSearcher import ArmijoWolfeLineSearcher
 NewtonMsgTag = "NewtonIteration"
 class NewtonIteration:
@@ -78,8 +79,80 @@ class NewtonIteration:
             iterNum+=1
         Log.Warning(NewtonMsgTag,f"Reached Maximum iterations X={X},NotFoundRoots,f={fx},f'={gradient}\n")
         return (X,fx,gradient)
-            
 
+    def calMinD(gradient,gradientSquare,fx,HessMatrix,detH):
+        #if detH ==0:
+        #t = -abs(fx)/gradientSquare
+        #d = t*gradient
+        if MM.isClose(detH,0.0):
+            d = -abs(fx)/gradientSquare*gradient
+            Log.Debug(NewtonMsgTag,f"detH close to 0,detH={detH},d=\n{d},HessMatrix={HessMatrix}")
+        else:
+            d = abs(ML.getInverse(HessMatrix))@gradient*(-1.0)
+        return d
+
+    def calMin(self,initX,calHessianFunc,*FuncGradArgs,customLineSearcher=None):
+        """
+        calMin of f,
+        intX->first search point
+        calHessianFunc->cal f''(X)
+        funcGradArgs-> parameters of for calF,calFAndGrad,calHessianFunc
+        customLineSearcher-> if is None: then defaultLineSearcher = ArmijoWolfeLineSearcher
+        return (X,fx,gradient,f'')
+        """
+        lineSh = customLineSearcher
+        if lineSh is None:
+            lineSh = self.defaultLineSh
+        iterNum = 0
+        X = initX
+        fx = None
+        N = len(X)
+        lastd = None
+        gradient = None
+        hessM = None
+        while iterNum < self.maxIteration:
+            (fx,gradient) = self.calFuncAndGradient(X,*FuncGradArgs)
+           
+            # if math.isclose(fx,0.0,abs_tol=self.epslion):
+            #     Log.Info(NewtonMsgTag,f"found result root={X},iterNum={iterNum}\n")
+            #     return (X,fx,gradient)
+            
+            gradientSquare= gradient.T@gradient
+            hessM = calHessianFunc(X,*FuncGradArgs)
+            detH = ML.det(hessM)
+             # avoid special saddle point 
+            # if(detH==0):
+            #     X = X + self.skipGrad0Eps# self.epslion
+            #     iterNum+=1
+            #     Log.Debug(NewtonMsgTag,f"skip for detH=0-> iterNum={iterNum},X={X},fx={fx},grad=\n{gradient}\n,HesssianMatrix=\n{hessM}")
+            #     continue
+           
+            if math.isclose(gradientSquare,0.0,abs_tol=self.epslion*self.epslion):
+                # avoid saddle point and some other flat areas
+                Log.Debug(NewtonMsgTag,f"try find the min-> iterNum={iterNum},X={X},fx={fx},grad=\n{gradient}\n,HesssianMatrix=\n{hessM}")
+                if(detH<=1e-5):
+                    Log.Debug(NewtonMsgTag,f"saddle or other situation")
+                    if lastd is None:
+                         X = X + self.skipGrad0Eps
+                    else:
+                        X = X + self.skipGrad0Eps*lastd*1.0/(math.sqrt(lastd.T@lastd))# self.epslion
+                    iterNum+=1
+                    
+                    continue
+                Log.Debug(NewtonMsgTag,f"try find the min-> succeed-min")
+                return (X,fx,gradient)
+            #d = -fx/gradient
+            d = NewtonIteration.calMinD(gradient,gradientSquare,fx,hessM,detH)
+            Log.Debug(NewtonMsgTag,f"iterNum={iterNum},X={X},fx={fx},d={d},grad=\n{gradient}\n,HesssianMatrix=\n{hessM}")
+            alpha = lineSh.lineSearchMin(X,d,fx,gradient,*FuncGradArgs)
+            lambda_k =1.0# min(1, 0.5/abs(fx))
+            X = X +d*(lambda_k*alpha)
+            iterNum+=1
+            lastd = d
+        Log.Warning(NewtonMsgTag,f"Reached Maximum iterations X={X},NotFoundRoots,f={fx},f'={gradient}\n")
+        return (X,fx,gradient)
+
+    
 
        
 
