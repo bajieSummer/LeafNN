@@ -22,6 +22,15 @@ https://www.youtube.com/watch?v=Jxh2kqVz6lk
 Armijo: f(x+a*d)<=f(x)+c1*a*d*f'(x)
 Wolfe: -d.T*f'(x+a*d)>c2*d.T*f'(x)
 
+6.Interior point method?
+7.why saddle point or flat area, that the |H|<=0?
+8.wolfe condition might refuse larger alpha step, like f(x)=x^3 +1, x=0.1, d= -1000, 
+normally wolfe condition will only accept that new gradient projection length  < old one
+I make it exception
+
+9. there is a problem sometimes the x,y won't just walk towards the gradient, some times might get bias? like y = x^3 + y^3+1, 
+
+
 
 
 
