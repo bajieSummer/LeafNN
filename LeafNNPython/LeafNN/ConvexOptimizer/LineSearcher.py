@@ -100,11 +100,12 @@ class ArmijoLineSearcher(BaseLineSearcher):
         iterNum = 0
         #(f1,grad1) = self.calFAndGradFunc(X,*funcArgs)
         #Log.Debug(MsgTagArmijo,f"fisrt X={X},d={d}")
+        d_grad1 = d.T@grad1
         while iterNum < self.maxIteraion:
             f2 = self.calFFunc(X + alpha*d,*funcArgs)
             lhs = f2
             # f2<=f1+sigma*alpha*grad.T*dk
-            rhs = f1+self.sigma*alpha*(d.T@grad1) # (1-self.sigma*alpha)*abs(f1)
+            rhs = f1+self.sigma*alpha*(d_grad1) # (1-self.sigma*alpha)*abs(f1)
             #rhs = f1 + self.sigma*alpha*grad1*d 
             if lhs<=rhs:
                 Log.Info(MsgTagArmijo,f"f2={f2},f1={f1},rhs={rhs},alpha={alpha},LineiterNum={iterNum},d={d}")
@@ -177,11 +178,13 @@ class ArmijoWolfeLineSearcher(BaseLineSearcher):
             # strong wolfe condition2: abs(d*f'(x1+alpha*d))>abs(d*f'(x1)*sigma2)
             #wolfeFit = grad2*d<grad1*self.sigma2*d# abs(grad2)>abs(grad1*self.sigma2)
             wolfeFit = d.T@grad2>d_grad1*self.sigma2
+            Log.Info(MsgTagArmijo,f"lineSearchIter={iterNum} x={X},f2={f2},f1={f1},rhs={rhs},alpha={alpha},grad1={grad1},grad2={grad2},d={d}")
             if armijoFit:#armijo fit
-                Log.Info(MsgTagArmijo,f"armijoFit f2={f2},f1={f1},rhs={rhs},alpha={alpha},LineiterNum={iterNum},d={d}")
-            if wolfeFit:
-                    Log.Info(MsgTagArmijo,f"wolfe Fit f2={f2},f1={f1},grad1={grad1},grad2={grad2},LineiterNum={iterNum},alpha={alpha},d={d}")
-            if armijoFit and wolfeFit:
+                    Log.Info(MsgTagArmijo,f"armijoFit")
+            if wolfeFit:# just refuse small alpha
+                    Log.Info(MsgTagArmijo,f"wolfe Fit")
+            if armijoFit and (wolfeFit or  f2<f1*2.0):
+                Log.Info(MsgTagArmijo,f"wolfe_armijoFit both")
                 return alpha
             else:
                 alpha =self.alphaSC*alpha
