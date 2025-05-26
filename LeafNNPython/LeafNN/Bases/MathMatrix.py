@@ -16,6 +16,11 @@ class MathMatrix:
         """Create an array of zeros with dtype float128."""
         return np.zeros(shape, dtype=MathMatrix.default_Type, **kwargs)
 
+    # Custom wrapper for np.identity
+    def identity(n):
+        """Create an array of zeros with dtype float128."""
+        return np.identity(n, dtype=MathMatrix.default_Type)
+
     def diag(v, k=0):
         """Create diag matrix with existed array v."""
         return np.diag(v,k)
@@ -142,6 +147,9 @@ class MathMatrix:
     def linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None,
              axis=0, *, device=None):
         return np.linspace(start=start,stop=stop,num=num,endpoint=endpoint,retstep=retstep,dtype=dtype,axis=axis,device=device)
+
+    def meshgrid(*xi, copy=True, sparse=False, indexing='xy'):
+        return np.meshgrid(*xi, copy=copy, sparse=sparse, indexing=indexing)
 
     def is_numpy_array(variable):
         return isinstance(variable, np.ndarray)
