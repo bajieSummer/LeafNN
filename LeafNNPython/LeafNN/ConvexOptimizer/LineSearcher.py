@@ -183,7 +183,7 @@ class ArmijoWolfeLineSearcher(BaseLineSearcher):
                     Log.Info(MsgTagArmijo,f"armijoFit")
             if wolfeFit:# just refuse small alpha
                     Log.Info(MsgTagArmijo,f"wolfe Fit")
-            if armijoFit and (wolfeFit or  f2<f1*2.0):
+            if armijoFit and (wolfeFit or  alpha>=0.5): #f2<f1*2.0
                 Log.Info(MsgTagArmijo,f"wolfe_armijoFit both")
                 return alpha
             else:
