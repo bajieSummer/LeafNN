@@ -30,6 +30,9 @@ I make it exception
 
 9. there is a problem sometimes the x,y won't just walk towards the gradient, some times might get bias? like y = x^3 + y^3+1, 
 
+10. newIdeas: how about skip some smaller-weight nodes, and go on.
+
+11. for flat area, stop and oscilated
 
 
 
