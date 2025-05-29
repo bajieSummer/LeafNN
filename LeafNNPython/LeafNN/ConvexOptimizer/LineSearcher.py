@@ -4,11 +4,11 @@ from LeafNN.utils.Log import Log
 MsgTagBaseLS= "BaseLineSearcher"
 
 class BaseLineSearcher:
-    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteraion = 20):
+    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteration = 40):
         self.calFFunc = calFFunc
         self.calFAndGradFunc = calFAndGradFunc
-        self.maxIteraion = maxIteraion
-        self.epslion=1e-8
+        self.maxIteraion = maxIteration
+        self.epslion=math.pow(2.0,-self.maxIteraion)
         self.alhpaSC = alphaScaleMulti
     
     def lineSearch(self,X,d,f1,grad1,*funcArgs):
@@ -26,8 +26,8 @@ class BaseLineSearcher:
                 return alpha
             else:
                 alpha =self.alhpaSC*alpha
-                if alpha < self.epslion:
-                    break
+                # if alpha < self.epslion:
+                #     break
             iterNum+=1
         Log.Warning(MsgTagBaseLS,f"failed to find the alpha,alpha={alpha},iterNum={iterNum}")
         return alpha
@@ -47,15 +47,15 @@ class BaseLineSearcher:
                 return alpha
             else:
                 alpha =self.alhpaSC*alpha
-                if alpha < self.epslion:
-                    break
+                # if alpha < self.epslion:
+                #     break
             iterNum+=1
         Log.Warning(MsgTagBaseLS,f"failed to find the alpha,alpha={alpha},iterNum={iterNum}")
         return alpha
 
 class ZeroLineSearcher(BaseLineSearcher):
-    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteraion = 20):
-        super().__init__(calFFunc,calFAndGradFunc,maxIteraion)
+    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteration = 40):
+        super().__init__(calFFunc,calFAndGradFunc,maxIteration)
         self.alphaSC = alphaScaleMulti
 
     def lineSearch(self,X,d,f1,grad1,*funcArgs):
@@ -65,8 +65,8 @@ class ZeroLineSearcher(BaseLineSearcher):
 
 MsgTagArmijo = "ArmijoLineSearcher"
 class ArmijoLineSearcher(BaseLineSearcher):
-    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteraion = 20,sigma = 0.4):
-        super().__init__(calFFunc,calFAndGradFunc,maxIteraion)
+    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteration = 40,sigma = 0.4):
+        super().__init__(calFFunc,calFAndGradFunc,maxItertaion)
         self.sigma = sigma
         self.alphaSC = alphaScaleMulti
     
@@ -89,8 +89,8 @@ class ArmijoLineSearcher(BaseLineSearcher):
                 return alpha
             else:
                 alpha =self.alphaSC*alpha
-                if alpha < self.epslion:
-                    break
+                # if alpha < self.epslion:
+                #     break
             iterNum+=1
         Log.Warning(MsgTagArmijo,f"failed to find the alpha,alpha={alpha},iterNum={iterNum}")
         return alpha
@@ -112,16 +112,16 @@ class ArmijoLineSearcher(BaseLineSearcher):
                 return alpha
             else:
                 alpha =self.alphaSC*alpha
-                if alpha < self.epslion:
-                    break
+                # if alpha < self.epslion:
+                #     break
             iterNum+=1
         Log.Warning(MsgTagArmijo,f"failed to find the alpha,alpha={alpha},iterNum={iterNum}")
         return alpha
 
 MsgTagArmijo = "ArmijoWolfeLineSearcher"
 class ArmijoWolfeLineSearcher(BaseLineSearcher):
-    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteraion = 20,sigma1 = 0.4,sigma2=0.5):
-        super().__init__(calFFunc,calFAndGradFunc,maxIteraion)
+    def __init__(self,calFFunc,calFAndGradFunc,alphaScaleMulti=0.5,maxIteration = 40,sigma1 = 0.4,sigma2=0.5):
+        super().__init__(calFFunc,calFAndGradFunc,maxIteration)
         self.sigma1 = sigma1
         self.sigma2 = sigma2
         self.alphaSC = alphaScaleMulti
@@ -155,8 +155,8 @@ class ArmijoWolfeLineSearcher(BaseLineSearcher):
                 return alpha
             else:
                 alpha =self.alphaSC*alpha
-                if alpha < self.epslion:
-                    break
+                # if alpha < self.epslion:
+                #     break
             iterNum+=1
         Log.Warning(MsgTagArmijo,f"failed to find the alpha,alpha={alpha},iterNum={iterNum}")
         return alpha
@@ -170,6 +170,9 @@ class ArmijoWolfeLineSearcher(BaseLineSearcher):
         while iterNum < self.maxIteraion:
             (f2,grad2) = self.calFAndGradFunc(X + alpha*d,*funcArgs)
             # f2<=f1+sigma*alpha*f'(x1)*dk
+            if f2 is None:
+                alpha = alpha*(1.0-self.epslion)
+                continue
             lhs = f2
             rhs = f1+self.sigma1*alpha*(d_grad1) # (1-self.sigma*alpha)*abs(f1)
             armijoFit =  lhs<=rhs
@@ -188,8 +191,8 @@ class ArmijoWolfeLineSearcher(BaseLineSearcher):
                 return alpha
             else:
                 alpha =self.alphaSC*alpha
-                if alpha < self.epslion:
-                    break
+                # if alpha < self.epslion:
+                #     break
             iterNum+=1
         Log.Warning(MsgTagArmijo,f"failed to find the alpha,alpha={alpha},iterNum={iterNum}")
         return alpha
