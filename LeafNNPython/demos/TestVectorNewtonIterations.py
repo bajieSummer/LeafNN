@@ -19,7 +19,7 @@ def calDPolyF(X,argsList):
         Log.Error(tag_msg,f"shape is not right, we should have (N,1), but shapeX={X.shape}")
         return None
     cacheX = []
-    f = 0
+    f = doulbe(0)
     N = len(argsList) # which means N variables
     cacheX = MM.ones([N,1])
     for i in range(N):
@@ -322,14 +322,14 @@ def runCases():
     initXArr = [100,10]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = 0.0
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     f_str = "1e10*x^2 +y^2"
     argsList=[[0,0,1e10],[0,0,1]]
     initXArr = [10000,1]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = 1e-20
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     
     f_str = "x^2 +y"
@@ -337,7 +337,7 @@ def runCases():
     initXArr = [100,10]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = -1.0+32 #200 iterations iterNum = 200
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     # ##will be oscillated durning near (-0.5,1.8)
     f_str = " x^3-2*x +2"
@@ -345,21 +345,21 @@ def runCases():
     initXArr=[1.2]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = 0.92# fx 0.911337892,itersNum = 5
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     f_str = "x^2 -y^2" # saddle point1 localMinimal
     argsList=[[0,0,1],[0,0,-1]]
     initXArr=[1,1]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = -6.0+119# ,itersNum = 200
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     f_str = "x^3 +1" # degenerated saddle point1 localMinimal
     argsList=[[1,0,0,1]]
     initXArr=[10.0]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False,100,1e-5)
     expectLessF = -4.0+16# ,itersNum = 200
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
 
     f_str = "x^7 +1"  #saddle point 2
@@ -367,44 +367,50 @@ def runCases():
     initXArr=[0.5]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = -4.0+20# ,itersNum = 200
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     f_str = "x^3 + y^3 +2"
     argsList=[[1,0,0,1],[1,0,0,1]]
     initXArr=[600,10]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False)
     expectLessF = -2.0e+66# ,itersNum = 
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     f_str = "x^7 + y^7+1" # saddle and flat area
     argsList=[[1,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1]]
     initXArr=[10,1]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False,300,1e-5)
     expectLessF = -4.0+58# ,itersNum = 300
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
     
     f_str = "x^8" # flat area
     argsList=[[0,0,0,0,0,0,0,0,1]]
     initXArr=[0.1]
     (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False,200,1e-5)
     expectLessF = 1e-15# ,itersNum = 200
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
 
     f_str = "x^8 + y^8" # flat area
     argsList=[[0,0,0,0,0,0,0,0,10000],[0,0,0,0,0,0,0,0,1]]
     initXArr=[0.1,0.2]
-    (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False,100,1e-5)
+    (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False,200,1e-5)
     expectLessF = 1e-15# ,itersNum = 200
-    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF))
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
     
+    f_str = "10*x^8 + y^8 +20" # flat area
+    argsList=[[20,0,0,0,0,0,0,0,10],[0,0,0,0,0,0,0,0,1]]
+    initXArr=[0.1,0.2]
+    (X,fx,grad,iterNums)=runCase(initXArr,argsList,f_str,False,200,1e-5)
+    expectLessF = 20.01# ,itersNum = 200
+    casesRes.append((f_str,X,fx,grad,iterNums,expectLessF,initXArr))
     
     print("casesRunCollection Result-------->>>>\n")
     for case in casesRes:
-        (f_stri,X,fx,grad,iterNums,expectLessF) = case
+        (f_stri,X,fx,grad,iterNums,expectLessF,initXArr) = case
         isPasStr = "caseSucceed"
         if fx >expectLessF:
             isPasStr = "caseFailed"
-        Log.Debug(tag_msg, f"isPasStr={isPasStr}\n case_f={f_stri}:\n fx={fx},expectF={expectLessF},iterNum={iterNums},X=\n{X}\n,grad=\n{grad}\n")
+        Log.Debug(tag_msg, f"isPasStr={isPasStr}\n case_f={f_stri}:\n initX={initXArr}, lastfx={fx},expectF={expectLessF},iterNum={iterNums},X=\n{X}\n,grad=\n{grad}\n")
 
 
 
