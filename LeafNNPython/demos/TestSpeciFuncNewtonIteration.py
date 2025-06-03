@@ -258,33 +258,33 @@ def testLogLinearNewton():
 #testCaselogLinear()
 testLogLinearNewton()
 
-# import numpy as np
-# from scipy.optimize import minimize
-# def testSpy1():
-#     def objective(x):
-#         return -20 * np.log(1000 * x + 4) - 30
+import numpy as np
+from scipy.optimize import minimize
+def testSpy1():
+    def objective(x):
+        return -20 * np.log(1000 * x + 4) - 30
 
-#     def gradient(x):
-#         return -20000 / (1000 * x + 4)
+    def gradient(x):
+        return -20000 / (1000 * x + 4)
 
-#     def hessian(x):
-#         return 20_000_000 / (1000 * x + 4)**2
+    def hessian(x):
+        return 20_000_000 / (1000 * x + 4)**2
 
-#     # 初始猜测值（需满足 1000x + 4 > 0）
-#     x0 = 0.1  
+    # 初始猜测值（需满足 1000x + 4 > 0）
+    x0 = 0.1  
 
-#     # 调用Newton-CG方法
-#     result = minimize(
-#         objective,
-#         x0,
-#         method='L-BFGS-B',
-#         jac=gradient,
-#         hess=hessian,
-#         options={'xtol': 1e-8}
-#     )
+    # 调用Newton-CG方法
+    result = minimize(
+        objective,
+        x0,
+        method='L-BFGS-B',
+        jac=gradient,
+        hess=hessian,
+        options={'xtol': 1e-8}
+    )
 
-#     print("最优解 x =", result.x)
-#     print("函数最小值 f(x) =", result.fun)
+    print("最优解 x =", result.x)
+    print("函数最小值 f(x) =", result.fun)
 
 
 #testSpy1()
