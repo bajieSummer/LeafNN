@@ -33,6 +33,7 @@ I make it exception
 10. newIdeas: how about skip some smaller-weight nodes, and go on.
 
 11. for flat area, stop and oscilated
+12. why in L-BFGS, qk-1 = Vk-1*qk =(I-pk-1*sk-1*yk-1.T)*qk, for qk=gk=f'k
 
 
 
