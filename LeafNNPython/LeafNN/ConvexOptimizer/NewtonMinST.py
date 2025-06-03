@@ -5,14 +5,21 @@ from LeafNN.Bases.MatrixLinear import MatrixLinear as ML
 import math
 tag_msg="NewtonMinST"
 class NewtonMinST:
-    def _calMinD(gradient,gradientSquare,fx,HessMatrix,detH,epsilon,skipGrad0Eps,hessianDamp):
+    def _calMinD(fx,gradient,HessMatrix,gradientSquare,detH,epsilon,skipGrad0Eps,hessianDamp):
         #if detH ==0:
         #t = -abs(fx)/gradientSquare
         #d = t*gradient
         isDetH0 = math.isclose(detH,0.0,abs_tol=epsilon)
         isGradient0 =  math.isclose(gradientSquare,0.0,abs_tol=epsilon*epsilon)
         isf0 = math.isclose(fx,0.0,abs_tol=skipGrad0Eps)
-       
+        if (isDetH0 and isGradient0):
+            # saddle point or flat area:
+            # try something new to distract from saddle point, and marching on the new point
+            t = 1.0/MM.sqrt(gradientSquare)
+            d = -1.0*gradient*t*0.0001
+            return d
+            #Log.Debug(tag_msg,f"take adventures-->t={t},d={d}")
+
         # if isDetH0:
         #     if not isGradient0:
         #         # means exist gradient0 on some direction but can escape from other direction
@@ -125,7 +132,7 @@ class NewtonMinST:
                 # Log.Debug(NewtonMsgTag,f"try find the min-> succeed-min")
                 # return (X,fx,gradient)
             #d = -fx/gradient
-            d = NewtonMinST._calMinD(gradient,gradientSquare,fx,hessM,detH,epsilon,skipGrad0Eps,hessianDamp)
+            d = NewtonMinST._calMinD(fx,gradient,hessM,gradientSquare,detH,epsilon,skipGrad0Eps,hessianDamp)
             Log.Debug(tag_msg,f"iterNum={iterNum},X={X},fx={fx},detH={detH},d={d},grad=\n{gradient}\n,HesssianMatrix=\n{hessM}")
             alpha = lineSh.lineSearchMin(X,d,fx,gradient,*FuncGradArgs)
             # min(1, 0.5/abs(fx))
