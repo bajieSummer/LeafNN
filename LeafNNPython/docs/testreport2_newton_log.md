@@ -1,6 +1,3 @@
-
-[[Debug]:[TestSpecialNT]AllLogLinearTestCasesResultsAs below casesNum=5
-]
 [[Debug]:[TestSpecialNT]isPasStr=caseSucceed case_f=y = 2*log10(3.0x+4)-20:
  initX=[5]
 ,lastfx=-inf,expectLessF=1e-15,iterNum=3
@@ -19,11 +16,11 @@
 ]
 [[Debug]:[TestSpecialNT]isPasStr=caseSucceed case_f=y = -20*ln(1000x+4)-30:
  initX=[100]
-,lastfx=-1175.1704360849587,expectLessF=-1000,iterNum=200
+,lastfx=-1149.303273479762,expectLessF=-1000,iterNum=200
 ,X=
-[[7.390151873640166e+21]]
+[[2.0200483406285727e+21]]
 ,grad=
-[[-2.716251218441176e-21]]
+[[-9.900753164043914e-21]]
 ]
 [[Debug]:[TestSpecialNT]isPasStr=caseSucceed case_f=y = -20*ln(1000x+y+4)-30:
  initX=[1, 100]

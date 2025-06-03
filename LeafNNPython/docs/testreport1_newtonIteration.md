@@ -1,10 +1,3 @@
-[[Debug]:[testVectorNewtonIteration]case_f=10*x^8 + y^8 +20,X=
-[[0.00013213]
- [0.00026332]]
-,fx=20.0,grad=
-[[5.62449474e-26]
- [7.02277572e-25]]
-]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^2 +y^2:
  initX=[100, 10], lastfx=0.0,expectF=0.0,iterNum=200,X=
@@ -25,7 +18,7 @@
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^2 +y:
- initX=[100, 10], lastfx=-1.9900000000000046e+42,expectF=31.0,iterNum=200,X=
+ initX=[100, 10], lastfx=-1.9900000000000046e+42,expectF=-1e+32,iterNum=200,X=
 [[ 0.e+00]
  [-2.e+42]]
 ,grad=
@@ -41,7 +34,7 @@
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^2 -y^2:
- initX=[1, 1], lastfx=-6.455624695217272e+119,expectF=113.0,iterNum=200,X=
+ initX=[1, 1], lastfx=-6.455624695217272e+119,expectF=-6e+119,iterNum=200,X=
 [[0.00000000e+00]
  [1.60693804e+60]]
 ,grad=
@@ -50,58 +43,58 @@
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^3 +1:
- initX=[10.0], lastfx=1.0,expectF=12.0,iterNum=100,X=
-[[1.18329136e-29]]
+ initX=[10.0], lastfx=-1.0819872568528672e+54,expectF=-1e+40,iterNum=200,X=
+[[-1.53992171e+18]]
 ,grad=
-[[1.68021413e-57]]
+[[3.16181182e+36]]
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^7 +1:
- initX=[0.5], lastfx=1.0,expectF=16.0,iterNum=200,X=
-[[1.97068348e-09]]
+ initX=[0.5], lastfx=-1.064298932516771e+39,expectF=-4e+20,iterNum=200,X=
+[[-438774.71562756]]
 ,grad=
-[[4.15159318e-52]]
+[[1.98091966e+34]]
 ]
-[[Debug]:[testVectorNewtonIteration]isPasStr=caseFailed
+[[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^3 + y^3 +2:
- initX=[600, 10], lastfx=2.0,expectF=-2e+66,iterNum=200,X=
-[[7.71313912e-21]
- [1.32283770e-22]]
+ initX=[600, 10], lastfx=-2.260274519139314e+69,expectF=-2e+66,iterNum=200,X=
+[[-1.96854338e+23]
+ [-5.46806601e+19]]
 ,grad=
-[[1.78560152e-40]
- [5.24974041e-44]]
+[[5.16688403e+46]
+ [3.98663279e+39]]
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^7 + y^7+1:
- initX=[10, 1], lastfx=1.0,expectF=54.0,iterNum=300,X=
-[[1.00533145e-04]
- [1.47890014e-05]]
+ initX=[10, 1], lastfx=-1.2791770524925777e+86,expectF=-4e+58,iterNum=300,X=
+[[ 1.03741395e-17]
+ [-2.33311897e+12]]
 ,grad=
-[[7.25815336e-24]
- [7.32371227e-29]]
+[[2.60554167e-101]
+ [4.47753104e+074]]
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^8:
- initX=[0.1], lastfx=5.208887846877603e-59,expectF=1e-15,iterNum=200,X=
-[[5.17518884e-08]]
+ initX=[0.1], lastfx=3.882874276755522e-131,expectF=1e-15,iterNum=200,X=
+[[4.09869696e-17]]
 ,grad=
-[[8.03973748e-51]]
+[[-6.21726172e-114]]
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=x^8 + y^8:
- initX=[0.1, 0.2], lastfx=6.1250832772638976e-30,expectF=1e-15,iterNum=200,X=
-[[7.02747959e-05]
- [1.42720364e-04]]
+ initX=[0.1, 0.2], lastfx=1.424275897127667e-128,expectF=1e-15,iterNum=200,X=
+[[5.78973552e-17]
+ [1.51279646e-17]]
 ,grad=
-[[6.77610393e-25]
- [9.64925218e-27]]
+[[-3.44734519e-111]
+ [ 1.45064509e-117]]
 ]
 [[Debug]:[testVectorNewtonIteration]isPasStr=caseSucceed
  case_f=10*x^8 + y^8 +20:
- initX=[0.1, 0.2], lastfx=20.0,expectF=20.01,iterNum=200,X=
-[[0.00013213]
- [0.00026332]]
+ initX=[0.2, 0.1], lastfx=20.0,expectF=20.01,iterNum=200,X=
+[[-4.11892012e-05]
+ [ 1.83638997e-05]]
 ,grad=
-[[5.62449474e-26]
- [7.02277572e-25]]
+[[1.94665743e-28]
+ [5.64058322e-33]]
 ]
