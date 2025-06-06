@@ -4,6 +4,7 @@ from LeafNN.Bases.MathMatrix import MathMatrix as MM
 from LeafNN.Bases.MatrixLinear import MatrixLinear as ML
 from .LineSearcher import ArmijoWolfeLineSearcher
 from .NewtonMinST import NewtonMinST
+from .NewtonMinBFGS import NewtonMinBFGS
 NewtonMsgTag = "NewtonIteration"
 
 class NewtonIteration:
@@ -18,6 +19,7 @@ class NewtonIteration:
         self.calFFunc = calFFunc
         self.calFuncAndGradient = calFAndGradient
         self.maxIteration = maxIteration
+        self.tflatMax = self.maxIteration//3
         self.epslion = epslion
         self.skipGrad0Eps = skipGrad0Eps
         #self.defaultLineSh = ArmijoWolfeLineSearcher(calFFunc,calFAndGradient)
@@ -94,8 +96,19 @@ class NewtonIteration:
         funcTuple = (self.calFFunc,self.calFuncAndGradient,calHessianFunc)
         newtonArgsTuple = (self.maxIteration,self.epslion,self.skipGrad0Eps,self.hessianDamp)
         return NewtonMinST.calMin(initX,funcTuple,newtonArgsTuple,*FuncGradArgs,customLineSearcher=customLineSearcher,histDataCollector=histDataCollector)
+   
+    def calMinBFGS(self,initXArr,*FuncGradArgs,customLineSearcher=None,histDataCollector=None):
+        """
+        calMin of f,
+        intX->first search point
+        funcGradArgs-> parameters of for calF,calFAndGrad
+        customLineSearcher-> if is None: then defaultLineSearcher = ArmijoWolfeLineSearcher
+        return (X,fx,gradient,f'')
+        """
+        funcTuple = (self.calFFunc,self.calFuncAndGradient)
+        newtonArgsTuple = (self.maxIteration,self.epslion,self.tflatMax)
+        return NewtonMinBFGS.calMin(initXArr,funcTuple,newtonArgsTuple,*FuncGradArgs,customLineSearcher=customLineSearcher,histDataCollector=histDataCollector)
 
-    
 
        
 
