@@ -18,7 +18,7 @@ then how to prove?
 
 5.For Armijo and Wolfe condition, why c2 >c1?
 https://www.youtube.com/watch?v=Jxh2kqVz6lk
-![Alt text](image.png)
+![video screenshot](pics/image.png)
 Armijo: f(x+a*d)<=f(x)+c1*a*d*f'(x)
 Wolfe: -d.T*f'(x+a*d)>c2*d.T*f'(x)
 
