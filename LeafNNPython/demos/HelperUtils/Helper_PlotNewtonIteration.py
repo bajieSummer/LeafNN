@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
 from LeafNN.utils.Log import Log
+import math
 tag_msg = "PlotNewtonHelper"
 class PlotNewtonHelper:
     def getContourMesh(x0_min,x0_max,x1_min,x1_max,func,argsList,steps=400):
@@ -30,6 +31,9 @@ class PlotNewtonHelper:
 
 
     def drawHisData(hisData,extend=2,calPolyF=None,argsList=None,f_str=""):
+        """
+        hisData= [(X,fx,gradient),(X,fx,gradient),]
+        """
         X0data =[]
         X1data = []
         X0_min = None
@@ -37,6 +41,10 @@ class PlotNewtonHelper:
         X1_min = None 
         X1_max = None
         dimension = len(hisData[0][0])
+        fmin = hisData[-1][1]
+        if fmin == -1.0*math.inf:
+            # remove last data
+            hisData = hisData[:-1]
         for d in hisData:
             X = d[0]
             f = d[1]
@@ -77,6 +85,6 @@ class PlotNewtonHelper:
 
         plt.scatter(X0data, X1data, color='red', s=5, marker='D', label=label)
         plt.plot(X0data,X1data,color='black',label=label)
-        plt.title(f"Draw Iters:f={f_str},convergeNum={iterNum}")
+        plt.title(f"DrawIteration:f={f_str},convergeNum={iterNum},f_min={fmin:.3e}")
         plt.show()
     

@@ -1,4 +1,5 @@
 from LeafNN.Bases.MathMatrix import MathMatrix as MM
+tag_msg ="PolyFuncHelper"
 class PolyFuncHelper:
     def calDPolyF(X,argsList):
         # xi_argus = argsList[i]
@@ -10,7 +11,7 @@ class PolyFuncHelper:
             Log.Error(tag_msg,f"shape is not right, we should have (N,1), but shapeX={X.shape}")
             return None
         cacheX = []
-        f = 0
+        f = 0.0
         N = len(argsList) # which means N variables
         cacheX = MM.ones([N,1])
         for i in range(N):
@@ -49,4 +50,30 @@ class PolyFuncHelper:
                     if arg!=0:gradArr[i]+=arg*cacheX[i][j-1]*j
         grad = MM.array(gradArr).reshape([N,1])
         return (f,grad)
+  
+    def calDPolyFHessian(X,argsList):
+        # N = len(argsList): which means N variables
+        # xi_argus = argsList[i]
+        # for xi-> fxi += argsList[i][0] +  argsList[i][1]*Xi  + argsList[i][2]*Xi*Xi + argsList[i][3]*Xi*Xi*Xi + ..
+        # f = fx1+fx2+...fxN
+        # grad[i] =  argsList[i][1] + argsList[i][2]*2*xi + .. argsList[i][j]*j*xi^(j-1)+...
+        # grad2[i]= argsList[i][2]*2 + argsList[i][3]*3*2*xi +.. argsList[i][j]*j*(j-1)*xi^(j-2)+..
+        cacheX = []
+        # for xi cacheX[i] = [1,xi,xi^2,xi^3, ...]
+        grad2Arr = []
+        N = len(argsList) # which means N variables
+        cacheX = MM.ones([N,1])
+        for i in range(N):
+            M = len(argsList[i])# means the ithe variable has M polys
+            grad2Arr.append(0)
+            for j in range(M): 
+                if i==0 and j>0:
+                    #print(f"X^j=\n{X*cacheX[:,j-1:j]}")
+                    cacheX = MM.hstack([cacheX,X*cacheX[:,j-1:j]])
+                arg = argsList[i][j]
+                if j>1:
+                    if arg!=0:grad2Arr[i]+=arg*cacheX[i][j-2]*j*(j-1)
+        gradHess = MM.diag(grad2Arr)
+        return gradHess
+
     
