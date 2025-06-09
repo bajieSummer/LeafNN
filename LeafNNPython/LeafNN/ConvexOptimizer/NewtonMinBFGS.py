@@ -36,7 +36,7 @@ class NewtonMinBFGS:
         t = yk.T@sk 
         
         ykSquare = yk.T@yk
-        epsFlat=1e-5
+        epsFlat=1e-4
         epsFlatSqur = epsFlat*epsFlat
         tEscapeSaddleTryStart = tEscapeSaddleTry//3
         # flat area or saddle point
@@ -48,13 +48,16 @@ class NewtonMinBFGS:
             # if t1 == 0.0: # can't calculate any more
             #     d = -currentGrad
             tflat +=1
+            Log.Debug(tag_msg,f"calD::gradient->zero: currentX={currentX},tflat={tflat},currentGrad={currentGrad}")
             if tflat >tEscapeSaddleTryStart: # try escape
                 #only quiet close to zero
-                if math.isclose(0.0,t1,abs_tol=epsilon*epsilon): 
+                if math.isclose(0.0,t1,abs_tol=epsilon*epsilon*epsilon*epsilon):#
                     d = -currentGrad
                 else:
-                    d = -0.01*currentGrad/t1
-                Log.Debug(tag_msg,f"grad_curve_near_zero: currentX={currentX},tflat={tflat},d={d},gradSqaure={gradientSquare},tEscapeSaddleTry={tEscapeSaddleTry}")
+                    # signs = MM.getSign(currentGrad)
+                    # (gm,gn) = currentGrad.shape
+                    d = -0.1*currentGrad/t1 #-0.1*signs*MM.rand(gm).reshape([gm,gn])
+                Log.Debug(tag_msg,f"grad_curve_near_zero: currentX={currentX},tflat={tflat},gradientLength={t1},d={d},gradSqaure={gradientSquare},tEscapeSaddleTry={tEscapeSaddleTry},grad={currentGrad}")
                 return (d,I,tflat)
             
 
@@ -80,7 +83,7 @@ class NewtonMinBFGS:
             Log.Debug(tag_msg,f"negative or less 0 t={t}")
             H = lastH + delt*I # lastH+delt*I
         #calH
-        Log.Debug(tag_msg,f"calMinD-->currentX={currentX}\n,lastX={lastX}\n,grad={currentGrad}\n,lastGrad={lastGrad}\n lastH={lastH}\n tflat={tflat} t={t}\n")
+        Log.Debug(tag_msg,f"calMinD-->currentX={currentX}\n,lastX={lastX}\n,grad={currentGrad}\n,lastGrad={lastGrad}\n H={H}\n tflat={tflat} t={t}\n")
 
         #H = Vk.T@lastH@Vk + alpha*MS
         # detH = 1.0/ML.det(H)
@@ -147,16 +150,16 @@ class NewtonMinBFGS:
                     dx = X-lastX
                     dxSquare = dx.T@dx
                     if math.isclose(dxSquare,0.0,abs_tol=epsilon*epsilon*epsilon):# more strict
-                        Log.Debug(tag_msg,f"find the min-> localMin iterNum={iterNum},tflat={tflat} fx={fx},X={X},grad=\n{gradient}\n,InvHesssianMatrix=\n{H}\n")
+                        Log.Debug(tag_msg,f"find the min-> localMin iterNum={iterNum},tflat={tflat} fx={fx},X={X},grad=\n{gradient}\n,InvHesssianMatrix=\n{H},dx={dx}\n")
                         return (X,fx,gradient)
 
             (d,H,tflat) = NewtonMinBFGS._calMinD(X,gradient,gradientSquare,lastX,lastGrad,H,epsilon,tflat,tEscapeSaddleTry) 
             # d = NewtonMinBFGS._calMinD(fx,gradient,hessM,gradientSquare,detH,epsilon,skipGrad0Eps,hessianDamp)
             Log.Debug(tag_msg,f"beforeLS-iterNum={iterNum}-->fx={fx},d=\n{d}\n,X=\n{X}\n grad={gradient}\n")
-            # if lastd !=None:
+            # if tflat>2 and lastd is not None:
             #     d =  beta1*lastd + (1.0-beta1)*d
             alpha = lineSh.lineSearchMin(X,d,fx,gradient,*FuncGradArgs)
-            Log.Debug(tag_msg,f"afterLS-iterNum={iterNum}-->fx={fx},alpha={alpha},oldX=\n{X}\n,newX={X+d*alpha}\n d=\n{d}\n,grad=\n{gradient}\n,InvHesssianMatrix=\n{H}\n")
+            Log.Debug(tag_msg,f"afterLS-iterNum={iterNum}-->fx={fx},alpha={alpha},tflat={tflat},oldX=\n{X}\n,newX={X+d*alpha}\n d=\n{d}\n,grad=\n{gradient}\n,InvHesssianMatrix=\n{H}\n")
             # min(1, 0.5/abs(fx))
             lastX = X 
             lastGrad = gradient
