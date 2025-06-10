@@ -181,7 +181,7 @@ class ArmijoWolfeLineSearcher(BaseLineSearcher):
             # strong wolfe condition2: abs(d*f'(x1+alpha*d))>abs(d*f'(x1)*sigma2)
             #wolfeFit = grad2*d<grad1*self.sigma2*d# abs(grad2)>abs(grad1*self.sigma2)
             wolfeFit = d.T@grad2>d_grad1*self.sigma2
-            Log.Info(MsgTagArmijo,f"lineSearchIter={iterNum} x={X},f2={f2},f1={f1},rhs={rhs},alpha={alpha},grad1={grad1},grad2={grad2},d={d}")
+            Log.Info(MsgTagArmijo,f"lineSearchIter={iterNum} x={X},f2={f2},f1={f1},rhs={rhs},alpha={alpha},grad1={grad1},grad2={grad2},d={d},alpha*d={alpha*d}")
             if armijoFit:#armijo fit
                     Log.Info(MsgTagArmijo,f"armijoFit")
             if wolfeFit:# just refuse small alpha
