@@ -34,7 +34,7 @@ I make it exception
 
 11. for flat area, stop and oscilated
 12. why in L-BFGS, qk-1 = Vk-1*qk =(I-pk-1*sk-1*yk-1.T)*qk, for qk=gk=f'k
-13. lineSearch, when f1,f2,deltf(f1-f2) is pretty small like f1-f2<2**(-53),1e-16, might fail and cause swap, a way to improve the precision is to discard the const value, make the 0.0<f <1.0, then the precision will be 2**(-1023)
+13. lineSearch, when f1,f2,deltf(f1-f2) is pretty small like f1-f2<2**(-53),1e-16, might fail and cause oscillation, a way to improve the precision is to discard the const value, make the 0.0<f <1.0, then the precision will be 2**(-1023)
 
 
 
