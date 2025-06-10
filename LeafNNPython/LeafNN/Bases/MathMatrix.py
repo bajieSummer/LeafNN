@@ -157,6 +157,11 @@ class MathMatrix:
     def set_printoptions(precision,suppress,threshold=None):
         np.set_printoptions(precision=precision, suppress=suppress, threshold=threshold)
 
+    def getSign(v):
+        return np.sign(v)
+
+    
+
         
 # # Store the original np.array function
 # original_np_array = np.array
