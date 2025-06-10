@@ -14,6 +14,7 @@ class CaseArgs:
         self.tflatMax = tflatMax
         self.epslion =epslion
         self.customLineSearcher = customLineSearcher
+        self.extend = 0.0
 
 def runCase(caseResults,f_str,initXArr,argsList,funcTuple,caseArgs:CaseArgs,expectF):
     calF,calFAndGrad = funcTuple
@@ -29,7 +30,7 @@ def runCase(caseResults,f_str,initXArr,argsList,funcTuple,caseArgs:CaseArgs,expe
     (X,fx,grad)=newton.calMinBFGS(initXArr,argsList,customLineSearcher=LS,histDataCollector=hisData)
     iterNums = len(hisData)
     if caseArgs.drawPlots: 
-        PlotNewtonHelper.drawHisData(hisData,0,calF,argsList,f_str)
+        PlotNewtonHelper.drawHisData(hisData,caseArgs.extend,calF,argsList,f_str)
     Log.Debug(tag_msg, f"case_f={f_str},X=\n{X}\n,fx={fx},grad=\n{grad}\n")
     caseResults.append((f_str,X,fx,grad,iterNums,initXArr,expectF))
    # return (X,fx,grad,iterNums)
@@ -54,83 +55,106 @@ def printcaseResults(caseResults):
 
 def testSimpleNewtonBFGS():
     casesRes =[]
-    casesArgs =CaseArgs(True,200,100)
+    maxIteraion = 200
+    tflatMax = 100
+    casesArgs =CaseArgs(False,maxIteraion,tflatMax)
+    casesArgs.extend = 0.0
     funcTuple=(PolyFuncHelper.calDPolyF,PolyFuncHelper.calDPolyFAndGrad)
 
-    # f_str="x^2"
-    # argsList=[[0,0,1]]
-    # initXArr = [100]
-    # expectLessF = 0.0
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str="x^2"
+    argsList=[[0,0,1]]
+    initXArr = [100]
+    expectLessF = 0.0
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # f_str="x^8"
-    # argsList=[[0,0,0,0,0,0,0,0,1]]
-    # initXArr = [100]
-    # expectLessF = 0.00001
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str="x^8+x"
+    argsList=[[0,1,0,0,0,0,0,0,1]]
+    initXArr = [100]
+    expectLessF = 0.00001
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # # ##will be oscillated durning near (-0.5,1.8)
-    # f_str = " x^3-2*x +2"
-    # argsList=[[2,-2,0,1]]
-    # initXArr=[1.2]
-    # expectLessF = 0.95
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    # ##will be oscillated durning near (-0.5,1.8)
+    f_str = " x^3-2*x +2"
+    argsList=[[2,-2,0,1]]
+    initXArr=[1.2]
+    expectLessF = 0.95
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # f_str = "x^3 +1" # degenerated saddle point1 localMinimal
-    # argsList=[[1,0,0,1]]
-    # initXArr=[0.00001] # 0.01
-    # expectLessF = -1e36#-4.0e16# ,itersNum = 50
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^3 +1" # degenerated saddle point1 localMinimal
+    argsList=[[1,0,0,1]]
+    initXArr=[0.00001] # 0.01
+    expectLessF = -1e36#-4.0e16# ,itersNum = 50
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
    
-    # f_str = "x^2 -y^2" # saddle point1 localMinimal
-    # argsList=[[0,0,1],[0,0,-1]]
-    # initXArr=[1,1]
-    # expectLessF = -6.0e119# ,itersNum = 200
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^2 -y^2" # saddle point1 localMinimal
+    argsList=[[0,0,1],[0,0,-1]]
+    initXArr=[1,1]
+    expectLessF = -6.0e119# ,itersNum = 200
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
 
-    # f_str = "x^7 +1"  #saddle point 2
-    # argsList=[[1,0,0,0,0,0,0,1]]
-    # initXArr=[0.5]
-    # expectLessF = -4.0e20# ,itersNum = 200
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^7 +1"  #saddle point 2
+    argsList=[[1,0,0,0,0,0,0,1]]
+    initXArr=[0.5]
+    expectLessF = -4.0e20# ,itersNum = 200
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # f_str = "x^3 + y^3 +2"
-    # argsList=[[1,0,0,1],[1,0,0,1]]
-    # initXArr=[600,10]
-    # expectLessF = -2.0e66# ,itersNum = 
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^3 + y^3 +2"
+    argsList=[[1,0,0,1],[1,0,0,1]]
+    initXArr=[600,10]
+    expectLessF = -2.0e66# ,itersNum = 
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # f_str = "x^7 + y^7+1" # saddle and flat area
-    # argsList=[[1,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1]]
-    # initXArr=[10,1]
-    # expectLessF = -4.0e58# ,itersNum = 300
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^7 + y^7+1" # saddle and flat area
+    argsList=[[1,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1]]
+    initXArr=[10,1]
+    expectLessF = -4.0e58# ,itersNum = 300
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+
+    f_str = "1e-3x^7 + y^7+1" # saddle and flat area
+    argsList=[[1,0,0,0,0,0,0,1e-3],[0,0,0,0,0,0,0,1]]
+    initXArr=[1,1e5]
+    expectLessF = -4.0e58# ,itersNum = 300
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+
+    f_str = "1e-3x^7 + y^7+ z^7+1" # saddle and flat area
+    argsList=[[1,0,0,0,0,0,0,1e-3],[0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1]]
+    initXArr=[1,1e5,10]
+    expectLessF = -4.0e58# ,itersNum = 300
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+
+    f_str = "1e-3x^15 + y^15+1" # saddle and flat area
+    argsList=[[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1e-3],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]]
+    initXArr=[1,1e5]
+    expectLessF = -4.0e58# ,itersNum = 400
+    casesArgs.maxIteration = 400
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    casesArgs.maxIteration = maxIteraion
   
-    # f_str = "x^8" # flat area
-    # argsList=[[0,0,0,0,0,0,0,0,1]]
-    # initXArr=[0.1]
-    # expectLessF = 1e-15# ,itersNum = 200
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^8" # flat area
+    argsList=[[0,0,0,0,0,0,0,0,1]]
+    initXArr=[0.1]
+    expectLessF = 1e-15# ,itersNum = 200
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # f_str = "x^8 + y^8" # flat area
-    # argsList=[[0,0,0,0,0,0,0,0,10000],[0,0,0,0,0,0,0,0,1]]
-    # initXArr=[0.1,0.2]
-    # expectLessF = 1e-15# ,itersNum = 200
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^8 + y^8" # flat area
+    argsList=[[0,0,0,0,0,0,0,0,10000],[0,0,0,0,0,0,0,0,1]]
+    initXArr=[0.1,0.2]
+    expectLessF = 1e-15# ,itersNum = 200
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
  
-    f_str = "10*x^8 + y^8 +20" # flat area
+    f_str = "10*x^8 + y^8+20" #+20  # flat area
     argsList=[[20,0,0,0,0,0,0,0,10],[0,0,0,0,0,0,0,0,1]]
-    initXArr=[0.2,0.1]
+    initXArr=[10,100]#[0.2,0.1]
     expectLessF = 20.01# ,itersNum = 200
     runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
-    # f_str = "x^2 -y^2" # saddle point1 localMinimal
-    # argsList=[[0,0,1],[0,0,-1]]
-    # initXArr=[1,1]
-    # expectLessF = 1e-15
-    # runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
+    f_str = "x^2 -y^2" # saddle point1 localMinimal
+    argsList=[[0,0,1],[0,0,-1]]
+    initXArr=[1,1]
+    expectLessF = 1e-15
+    runCase(casesRes,f_str,initXArr,argsList,funcTuple,casesArgs,expectLessF)
 
 
     printcaseResults(casesRes)
