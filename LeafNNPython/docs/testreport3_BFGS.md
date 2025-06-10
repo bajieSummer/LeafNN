@@ -1,22 +1,22 @@
-[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^2:
+[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^2:
  initX=[100]
-,lastfx=0.0,expectLessF=0.0,iterNum=26
+,lastfx=0.0,expectLessF=0.0,iterNum=24
 ,X=
 [[0.]]
 ,grad=
 [[0.]]
 ]
-[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^8:
+[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^8+x:
  initX=[100]
-,lastfx=1.249357252293234e-58,expectLessF=1e-05,iterNum=86
+,lastfx=-0.6501225014974149,expectLessF=1e-05,iterNum=77
 ,X=
-[[-5.78210309e-08]]
+[[-0.74299714]]
 ,grad=
-[[-1.72858523e-50]]
+[[2.8077665e-08]]
 ]
 [[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f= x^3-2*x +2:
  initX=[1.2]
-,lastfx=0.9113378920963653,expectLessF=0.95,iterNum=29
+,lastfx=0.9113378920963653,expectLessF=0.95,iterNum=27
 ,X=
 [[0.81649658]]
 ,grad=
@@ -68,33 +68,65 @@
 [[inf]
  [inf]]
 ]
+[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=1e-3x^7 + y^7+1:
+ initX=[1, 100000.0]
+,lastfx=-inf,expectLessF=-4e+58,iterNum=161
+,X=
+[[-8.45566747e-002]
+ [-2.51435858e+233]]
+,grad=
+[[2.55849995e-09]
+ [           inf]]
+]
+[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=1e-3x^7 + y^7+ z^7+1:
+ initX=[1, 100000.0, 10]
+,lastfx=-inf,expectLessF=-4e+58,iterNum=5
+,X=
+[[ 9.79845387e-001]
+ [-2.32334254e+113]
+ [-2.18370207e+252]]
+,grad=
+[[0.00619503]
+ [       inf]
+ [       inf]]
+]
+[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=1e-3x^15 + y^15+1:
+ initX=[1, 100000.0]
+,lastfx=-inf,expectLessF=-4e+58,iterNum=325
+,X=
+[[ 1.52993583e-02]
+ [-3.81814737e+21]]
+,grad=
+[[5.77452528e-028]
+ [2.09907946e+303]]
+]
 [[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^8:
  initX=[0.1]
-,lastfx=6.764161434870308e-50,expectLessF=1e-15,iterNum=24
+,lastfx=5.635944379389146e-101,expectLessF=1e-15,iterNum=22
 ,X=
-[[7.14129125e-07]]
+[[-2.94354607e-13]]
 ,grad=
-[[7.57752199e-43]]
+[[-1.5317428e-87]]
 ]
 [[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^8 + y^8:
  initX=[0.1, 0.2]
-,lastfx=5.953861550294505e-50,expectLessF=1e-15,iterNum=31
+,lastfx=1.3822984162937259e-89,expectLessF=1e-15,iterNum=30
 ,X=
-[[2.10191025e-07]
- [6.18588975e-07]]
+[[-1.14054775e-12]
+ [ 7.80661298e-12]]
 ,grad=
-[[1.45007066e-42]
- [2.77271488e-43]]
+[[-2.00855758e-79]
+ [ 1.41360649e-77]]
 ]
-[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=10*x^8 + y^8 +20:
- initX=[0.2, 0.1]
-,lastfx=20.0,expectLessF=20.01,iterNum=200
+[[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=10*x^8 + y^8+20:
+ initX=[10, 100]
+,lastfx=20.0,expectLessF=20.01,iterNum=96
 ,X=
-[[0.00900817]
- [0.00021947]]
+[[ 0.00630009]
+ [-0.00145946]]
 ,grad=
-[[-7.55364101e-20]
- [ 1.96387793e-25]]
+[[ 3.15149847e-14]
+ [-1.12833252e-19]]
 ]
 [[Debug]:[TestNewtonBFGS]isPasStr=caseSucceed case_f=x^2 -y^2:
  initX=[1, 1]
