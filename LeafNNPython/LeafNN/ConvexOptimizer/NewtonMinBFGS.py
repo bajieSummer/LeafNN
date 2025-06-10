@@ -125,6 +125,7 @@ class NewtonMinBFGS:
         tflat = 0
         lastX = None
         lastGrad = None
+        lastf = math.inf
         
         # use EMA to escape saddle point
         beta1 = 0.9
@@ -137,8 +138,11 @@ class NewtonMinBFGS:
     
             gradientSquare= gradient.T@gradient
             if(fx == -1.0*math.inf): # already to the least
-                    Log.Debug(tag_msg,f"find the min-> -inf iterNum={iterNum},fx={fx},X={X},grad=\n{gradient}\n,InvHesssianMatrix=\n{H}\n")
-                    return (X,fx,gradient)
+                Log.Debug(tag_msg,f"find the min-> -inf iterNum={iterNum},fx={fx},X={X},grad=\n{gradient}\n,InvHesssianMatrix=\n{H}\n")
+                return (X,fx,gradient)
+            if(tflat>=tEscapeSaddleTry and math.isclose(0.0,lastf-fx,abs_tol=epsilon*epsilon*epsilon*epsilon)):
+                Log.Debug(tag_msg,f"find the min-> can't tell the f iterNum={iterNum},fx={fx},diff={lastf-fx},X={X},grad=\n{gradient}\n,InvHesssianMatrix=\n{H}\n")
+                return (X,fx,gradient)
             if math.isclose(gradientSquare,0.0,abs_tol=epsilon*epsilon):
                 if lastX is None: #if first  skip first zero point
                     X =X +0.01
@@ -164,6 +168,7 @@ class NewtonMinBFGS:
             lastX = X 
             lastGrad = gradient
             lastd = d
+            lastf = fx
             X = X +d*alpha
            
             iterNum+=1
